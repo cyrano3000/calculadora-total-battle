@@ -2,143 +2,95 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Ataques - Clan</title>
+    <title>Calculadora de Bajas FobS</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #2c1e16;
-            color: #f4e4bc;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-        .container {
-            background-color: #3d2b1f;
-            border: 2px solid #8b5a2b;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 500px;
-            width: 100%;
-        }
-        h2 { text-align: center; color: #d4af37; border-bottom: 1px solid #8b5a2b; padding-bottom: 10px; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; }
-        input {
-            width: 100%;
-            padding: 10px;
-            background: #1a110a;
-            border: 1px solid #8b5a2b;
-            color: #fff;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: #8b5a2b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        button:hover { background-color: #a06b3a; }
-        .results {
-            margin-top: 25px;
-            padding: 15px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 5px;
-            border-left: 4px solid #d4af37;
-        }
-        .results p { margin: 8px 0; font-family: monospace; font-size: 1.1em; }
-        .total {
-            font-size: 1.4em !important;
-            color: #d4af37;
-            border-top: 1px solid #8b5a2b;
-            padding-top: 10px;
-            font-weight: bold;
-        }
+        body { background: #1a110a; color: #f4e4bc; font-family: sans-serif; padding: 20px; }
+        .seccion { border: 1px solid #8b5a2b; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+        .fila { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        select, input { background: #2c1e16; color: white; border: 1px solid #8b5a2b; padding: 5px; }
+        .btn-add { background: #4a7c44; color: white; cursor: pointer; border: none; padding: 5px 10px; }
+        .total-box { font-size: 1.5em; color: #d4af37; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Informe de Ataque Recibido</h2>
-    
-    <div class="input-group">
-        <label>Plata sustraída:</label>
-        <input type="number" id="plata" placeholder="Ej: 200000" value="200000">
+    <h2>### Ataque recibido en WS registrada ###</h2>
+
+    <div class="seccion">
+        <h3>*BAJAS SUFRIDAS*</h3>
+        <div class="fila">
+            <label>Capitán Nivel:</label>
+            <input type="number" id="cap-lvl" placeholder="90">
+        </div>
+        
+        <div id="contenedor-tropas">
+            </div>
+        <button class="btn-add" onclick="agregarFilaTropa()">+ Añadir tipo de unidad</button>
     </div>
 
-    <div class="input-group">
-        <label>Nivel del Capitán atacante:</label>
-        <input type="number" id="nivel" placeholder="Ej: 90" value="90">
+    <div class="seccion">
+        <h3>*RECURSOS SUSTRAÍDOS*</h3>
+        <div id="contenedor-recursos"></div>
+        <button class="btn-add" onclick="agregarFilaRecurso()">+ Añadir recurso</button>
     </div>
 
-    <div class="input-group">
-        <label>Número de Espías:</label>
-        <input type="number" id="espias" placeholder="Ej: 5000" value="5000">
+    <div class="seccion">
+        <label>Compensar en:</label>
+        <input type="radio" name="tipoVal" value="plata" checked> Plata
+        <input type="radio" name="tipoVal" value="oro"> Oro
+        <br><br>
+        <button onclick="calcularTodo()" style="width:100%; padding:10px; font-weight:bold;">CALCULAR TOTAL COMPENSACIÓN</button>
+        <p class="total-box">A RECIBIR: <span id="resultado">0</span></p>
     </div>
-
-    <div class="input-group">
-        <label>Liderazgo (Multiplicador):</label>
-        <input type="number" id="liderazgo" placeholder="Ej: 5" value="5">
-    </div>
-
-    <div class="input-group">
-        <label>Cantidad de TAR sustraído:</label>
-        <input type="number" id="tar" placeholder="Ej: 9800" value="9800">
-    </div>
-
-    <button onclick="calcularAtaque()">CALCULAR TOTAL ORO</button>
-
-    <div class="results" id="output" style="display:none;">
-        <p>A (Multa): <span id="resA">0</span></p>
-        <p>B (Resurrección): <span id="resB">0</span></p>
-        <p>C (Pérdidas 10%): <span id="resC">0</span></p>
-        <p>D (Sustraído TAR): <span id="resD">0</span></p>
-        <p class="total">TOTAL: <span id="resTotal">0</span> monedas de oro</p>
-    </div>
-</div>
 
 <script>
-    function calcularAtaque() {
-        // Obtener valores de los inputs
-        const plata = parseFloat(document.getElementById('plata').value) || 0;
-        const nivel = parseFloat(document.getElementById('nivel').value) || 0;
-        const espias = parseFloat(document.getElementById('espias').value) || 0;
-        const liderazgo = parseFloat(document.getElementById('liderazgo').value) || 0;
-        const tar = parseFloat(document.getElementById('tar').value) || 0;
+    // Estos datos vendrían de tu archivo JSON
+    const DATA_COSTES = {
+        "Guardia": { "G1": 10, "G2": 25, "G3": 60 },
+        "Especialista": { "Espía": 40, "Carro": 100 }
+    };
 
-        // Fórmulas basadas en tu imagen
-        // A = plata / 3000
-        const A = Math.round(plata / 3000);
+    function agregarFilaTropa() {
+        const div = document.createElement('div');
+        div.className = 'fila';
+        div.innerHTML = `
+            <select onchange="actualizarTropas(this)">
+                <option value="">Tipo...</option>
+                ${Object.keys(DATA_COSTES).map(t => `<option value="${t}">${t}</option>`).join('')}
+            </select>
+            <select class="tropa-select"><option>Tropa...</option></select>
+            <input type="number" class="cant" placeholder="Cantidad">
+            <button onclick="this.parentElement.remove()">❌</button>
+        `;
+        document.getElementById('contenedor-tropas').appendChild(div);
+    }
 
-        // B = nivel + (espias * 0.9 * 40 * liderazgo / 3000)
-        const B = Math.round(nivel + (espias * 0.9 * 40 * liderazgo / 3000));
+    function actualizarTropas(selectTipo) {
+        const tropaSelect = selectTipo.parentElement.querySelector('.tropa-select');
+        const tipo = selectTipo.value;
+        tropaSelect.innerHTML = Object.keys(DATA_COSTES[tipo] || {}).map(t => `<option value="${t}">${t}</option>`).join('');
+    }
 
-        // C = espias * 0.1 * 1 (oro) * liderazgo
-        const C = Math.round(espias * 0.1 * 1 * liderazgo);
+    function agregarFilaRecurso() {
+        const div = document.createElement('div');
+        div.className = 'fila';
+        div.innerHTML = `
+            <select>
+                <option>Plata</option><option>TAR</option><option>Oro</option>
+            </select>
+            <input type="number" class="cant-res" placeholder="Cantidad">
+            <button onclick="this.parentElement.remove()">❌</button>
+        `;
+        document.getElementById('contenedor-recursos').appendChild(div);
+    }
 
-        // D = tar * 1.5
-        const D = Math.round(tar * 1.5);
-
-        const total = A + B + C + D;
-
-        // Mostrar resultados
-        document.getElementById('resA').innerText = A;
-        document.getElementById('resB').innerText = B;
-        document.getElementById('resC').innerText = C;
-        document.getElementById('resD').innerText = D;
-        document.getElementById('resTotal').innerText = total.toLocaleString();
-
-        document.getElementById('output').style.display = 'block';
+    function calcularTodo() {
+        // Aquí iría la lógica de suma multiplicando cantidad x coste del JSON
+        // Por ahora un ejemplo simple:
+        let total = 0;
+        document.querySelectorAll('.cant').forEach(i => total += (Number(i.value) * 1.5));
+        document.getElementById('resultado').innerText = total.toLocaleString();
     }
 </script>
-
 </body>
 </html>
