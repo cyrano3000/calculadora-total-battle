@@ -2,94 +2,189 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Calculadora de Bajas FobS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora FobS - Versión Final Corregida</title>
     <style>
-        body { background: #1a110a; color: #f4e4bc; font-family: sans-serif; padding: 20px; }
-        .seccion { border: 1px solid #8b5a2b; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-        .fila { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-        select, input { background: #2c1e16; color: white; border: 1px solid #8b5a2b; padding: 5px; }
-        .btn-add { background: #4a7c44; color: white; cursor: pointer; border: none; padding: 5px 10px; }
-        .total-box { font-size: 1.5em; color: #d4af37; font-weight: bold; }
+        body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .contenedor { max-width: 700px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 25px; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        h2 { color: #d4af37; text-align: center; border-bottom: 1px solid #8b5a2b; padding-bottom: 10px; margin-bottom: 20px; }
+        h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 4px solid #8b5a2b; padding-left: 10px; text-transform: uppercase; }
+
+        /* --- ESTILO DE LÍDERES (BOTÓN ÚNICO) --- */
+        .lider-fila { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px; }
+        .check-oculto { display: none; }
+        .boton-check {
+            width: 22px; height: 22px; border: 2px solid #8b5a2b; border-radius: 4px;
+            display: inline-block; cursor: pointer; transition: background 0.3s; position: relative;
+            background: #1a110a;
+        }
+        .check-oculto:checked + .boton-check { background: #4a7c44; border-color: #76b06d; }
+        .check-oculto:checked + .boton-check::after {
+            content: '✔'; color: white; position: absolute; left: 3px; top: -3px; font-size: 18px;
+        }
+        .lider-nombre { cursor: pointer; font-weight: bold; flex-grow: 1; }
+        .nivel-input { display: none; width: 100px; background: #1a110a; border: 1px solid #d4af37; color: white; padding: 6px; border-radius: 4px; text-align: center; }
+
+        /* --- FILAS DINÁMICAS --- */
+        .fila { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 5px; }
+        select, input[type="number"] { background: #1a110a; color: white; border: 1px solid #8b5a2b; padding: 8px; border-radius: 4px; flex-grow: 1; }
+        .btn-add { background: #4a7c44; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .btn-del { background: #8b2b2b; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        
+        .pago-opciones { margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; text-align: center; }
+        .total-box { margin-top: 20px; padding: 20px; background: #1a110a; border: 2px solid #d4af37; text-align: center; border-radius: 8px; }
+        #total-final { font-size: 2.5em; color: #d4af37; font-weight: bold; display: block; }
+        .btn-calc { background: #8b5a2b; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.1em; }
     </style>
 </head>
 <body>
 
-    <h2>### Ataque recibido en WS registrada ###</h2>
+<div class="contenedor">
+    <h2>### Informe de Ataque Registrado ###</h2>
 
-    <div class="seccion">
-        <h3>*BAJAS SUFRIDAS*</h3>
-        <div class="fila">
-            <label>Capitán Nivel:</label>
-            <input type="number" id="cap-lvl" placeholder="90">
+    <div class="seccion-lideres">
+        <h3>*ESTADO DE LÍDERES ATACANTES*</h3>
+        <div class="lider-fila">
+            <input type="checkbox" id="check-h" class="check-oculto" onclick="toggleNivel('check-h', 'n-h')">
+            <label for="check-h" class="boton-check"></label>
+            <label for="check-h" class="lider-nombre">Héroe</label>
+            <input type="number" id="n-h" class="nivel-input" placeholder="1-600" min="1" max="600">
         </div>
-        
-        <div id="contenedor-tropas">
-            </div>
+        <div class="lider-fila">
+            <input type="checkbox" id="check-c1" class="check-oculto" onclick="toggleNivel('check-c1', 'n-c1')">
+            <label for="check-c1" class="boton-check"></label>
+            <label for="check-c1" class="lider-nombre">Capitán 1</label>
+            <input type="number" id="n-c1" class="nivel-input" placeholder="1-600" min="1" max="600">
+        </div>
+        <div class="lider-fila">
+            <input type="checkbox" id="check-c2" class="check-oculto" onclick="toggleNivel('check-c2', 'n-c2')">
+            <label for="check-c2" class="boton-check"></label>
+            <label for="check-c2" class="lider-nombre">Capitán 2</label>
+            <input type="number" id="n-c2" class="nivel-input" placeholder="1-600" min="1" max="600">
+        </div>
+        <div class="lider-fila">
+            <input type="checkbox" id="check-c3" class="check-oculto" onclick="toggleNivel('check-c3', 'n-c3')">
+            <label for="check-c3" class="boton-check"></label>
+            <label for="check-c3" class="lider-nombre">Capitán 3</label>
+            <input type="number" id="n-c3" class="nivel-input" placeholder="1-600" min="1" max="600">
+        </div>
+    </div>
+
+    <div id="seccion-bajas">
+        <h3>*BAJAS SUFRIDAS*</h3>
+        <div id="contenedor-tropas"></div>
         <button class="btn-add" onclick="agregarFilaTropa()">+ Añadir tipo de unidad</button>
     </div>
 
-    <div class="seccion">
+    <div id="seccion-recursos">
         <h3>*RECURSOS SUSTRAÍDOS*</h3>
         <div id="contenedor-recursos"></div>
         <button class="btn-add" onclick="agregarFilaRecurso()">+ Añadir recurso</button>
     </div>
 
-    <div class="seccion">
-        <label>Compensar en:</label>
-        <input type="radio" name="tipoVal" value="plata" checked> Plata
-        <input type="radio" name="tipoVal" value="oro"> Oro
-        <br><br>
-        <button onclick="calcularTodo()" style="width:100%; padding:10px; font-weight:bold;">CALCULAR TOTAL COMPENSACIÓN</button>
-        <p class="total-box">A RECIBIR: <span id="resultado">0</span></p>
+    <div class="pago-opciones">
+        <p>CALCULAR TOTAL COMPENSACIÓN A elegir:</p>
+        <label><input type="radio" name="moneda" value="plata"> Valor en plata</label>
+        <label><input type="radio" name="moneda" value="oro" checked style="margin-left: 20px;"> Valor en oro</label>
     </div>
 
-<script>
-    // Estos datos vendrían de tu archivo JSON
-    const DATA_COSTES = {
-        "Guardia": { "G1": 10, "G2": 25, "G3": 60 },
-        "Especialista": { "Espía": 40, "Carro": 100 }
-    };
+    <button class="btn-calc" onclick="calcular()">CALCULAR TOTAL</button>
 
+    <div class="total-box">
+        <span>A RECIBIR:</span>
+        <span id="total-final">0</span>
+        <small id="tipo-texto">monedas de oro</small>
+    </div>
+</div>
+
+<script>
+    // Mostrar/Ocultar nivel de líderes
+    function toggleNivel(checkId, inputId) {
+        const input = document.getElementById(inputId);
+        const isChecked = document.getElementById(checkId).checked;
+        input.style.display = isChecked ? "block" : "none";
+        if (!isChecked) input.value = "";
+    }
+
+    // ARREGLADO: Función para añadir tropas
     function agregarFilaTropa() {
         const div = document.createElement('div');
         div.className = 'fila';
         div.innerHTML = `
-            <select onchange="actualizarTropas(this)">
-                <option value="">Tipo...</option>
-                ${Object.keys(DATA_COSTES).map(t => `<option value="${t}">${t}</option>`).join('')}
+            <select>
+                <option value="40">Espía (40 plata)</option>
+                <option value="100">Carro (100 plata)</option>
+                <option value="150">Ingeniero (150 plata)</option>
             </select>
-            <select class="tropa-select"><option>Tropa...</option></select>
-            <input type="number" class="cant" placeholder="Cantidad">
-            <button onclick="this.parentElement.remove()">❌</button>
+            <input type="number" class="cant-tropa" placeholder="Cantidad">
+            <button class="btn-del" onclick="this.parentElement.remove()">❌</button>
         `;
         document.getElementById('contenedor-tropas').appendChild(div);
     }
 
-    function actualizarTropas(selectTipo) {
-        const tropaSelect = selectTipo.parentElement.querySelector('.tropa-select');
-        const tipo = selectTipo.value;
-        tropaSelect.innerHTML = Object.keys(DATA_COSTES[tipo] || {}).map(t => `<option value="${t}">${t}</option>`).join('');
-    }
-
+    // ARREGLADO: Función para añadir recursos
     function agregarFilaRecurso() {
         const div = document.createElement('div');
         div.className = 'fila';
         div.innerHTML = `
-            <select>
-                <option>Plata</option><option>TAR</option><option>Oro</option>
+            <select class="res-tipo">
+                <option value="plata">Plata sustraída</option>
+                <option value="tar">TAR sustraído</option>
+                <option value="oro">Oro sustraído</option>
             </select>
-            <input type="number" class="cant-res" placeholder="Cantidad">
-            <button onclick="this.parentElement.remove()">❌</button>
+            <input type="number" class="res-cant" placeholder="Cantidad">
+            <button class="btn-del" onclick="this.parentElement.remove()">❌</button>
         `;
         document.getElementById('contenedor-recursos').appendChild(div);
     }
 
-    function calcularTodo() {
-        // Aquí iría la lógica de suma multiplicando cantidad x coste del JSON
-        // Por ahora un ejemplo simple:
-        let total = 0;
-        document.querySelectorAll('.cant').forEach(i => total += (Number(i.value) * 1.5));
-        document.getElementById('resultado').innerText = total.toLocaleString();
+    // Lógica de cálculo unificada (A+B+C+D)
+    function calcular() {
+        let totalOro = 0;
+        const liderazgo = 5; // Multiplicador de liderazgo fijo según tu ejemplo
+
+        // B: Niveles de líderes (Máximo 600 por líder)
+        ['n-h', 'n-c1', 'n-c2', 'n-c3'].forEach(id => {
+            let el = document.getElementById(id);
+            if (el && el.style.display === "block") {
+                let val = parseInt(el.value) || 0;
+                totalOro += Math.min(val, 600);
+            }
+        });
+
+        // B y C: Cálculo de tropas (90% resurrección en oro, 10% pérdida eterna)
+        document.querySelectorAll('#contenedor-tropas .fila').forEach(fila => {
+            let cant = parseInt(fila.querySelector('.cant-tropa').value) || 0;
+            let costePlata = parseInt(fila.querySelector('select').value);
+            
+            // Parte B (90% res): (Cant * 0.9 * coste * liderazgo) / 3000
+            totalOro += (cant * 0.9 * costePlata * liderazgo) / 3000;
+            // Parte C (10% pérdida): (Cant * 0.1 * 1 oro * liderazgo)
+            totalOro += (cant * 0.1 * 1 * liderazgo);
+        });
+
+        // A y D: Recursos sustraídos
+        document.querySelectorAll('#contenedor-recursos .fila').forEach(fila => {
+            let cant = parseInt(fila.querySelector('.res-cant').value) || 0;
+            let tipo = fila.querySelector('.res-tipo').value;
+            
+            if (tipo === "plata") totalOro += (cant / 3000); // Multa A
+            if (tipo === "tar") totalOro += (cant * 1.5);    // TAR D
+            if (tipo === "oro") totalOro += cant;
+        });
+
+        // Aplicar conversión final según elección
+        const modo = document.querySelector('input[name="moneda"]:checked').value;
+        const resultadoHTML = document.getElementById('total-final');
+        const tipoHTML = document.getElementById('tipo-texto');
+
+        if (modo === "plata") {
+            resultadoHTML.innerText = Math.round(totalOro * 3000).toLocaleString();
+            tipoHTML.innerText = "plata";
+        } else {
+            resultadoHTML.innerText = Math.round(totalOro).toLocaleString();
+            tipoHTML.innerText = "monedas de oro";
+        }
     }
 </script>
 </body>
