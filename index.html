@@ -3,30 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FobS Compensation Calculator - Fixed</title>
+    <title>FobS Compensation Calculator</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 700px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 25px; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
         h2 { color: #d4af37; text-align: center; border-bottom: 1px solid #8b5a2b; padding-bottom: 10px; margin-bottom: 20px; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 4px solid #8b5a2b; padding-left: 10px; text-transform: uppercase; }
-
-        /* Fixed Fine Section */
         .campo-fijo { background: #1a110a; color: #888; border: 1px solid #555; padding: 10px; border-radius: 4px; width: 100%; font-weight: bold; cursor: not-allowed; margin-top: 5px; }
-        
-        /* Leaders Section */
         .lider-fila { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px; }
         .check-oculto { display: none; }
         .boton-check { width: 22px; height: 22px; border: 2px solid #8b5a2b; border-radius: 4px; display: inline-block; cursor: pointer; background: #1a110a; position: relative; }
         .check-oculto:checked + .boton-check { background: #4a7c44; border-color: #76b06d; }
         .check-oculto:checked + .boton-check::after { content: '✔'; color: white; position: absolute; left: 3px; top: -3px; font-size: 18px; }
         .nivel-input { display: none; width: 100px; background: #1a110a; border: 1px solid #d4af37; color: white; padding: 6px; border-radius: 4px; text-align: center; }
-
-        /* Dynamic Rows */
         .fila { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 5px; }
         select, input[type="number"] { background: #1a110a; color: white; border: 1px solid #8b5a2b; padding: 8px; border-radius: 4px; flex-grow: 1; min-width: 120px; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 10px 0; }
-        
-        /* Results Section */
         .total-box { margin-top: 20px; padding: 20px; background: #1a110a; border: 2px solid #d4af37; text-align: center; border-radius: 8px; }
         #total-final { font-size: 2.5em; color: #d4af37; font-weight: bold; display: block; }
         .btn-calc { background: #8b5a2b; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.1em; }
@@ -40,7 +32,7 @@
     <div class="seccion">
         <h3>*BASE FINE*</h3>
         <label>Attack Fine (Silver):</label>
-        <input type="text" value="200,000" class="campo-fijo" readonly>
+        <input type="text" value="5,000,000" class="campo-fijo" readonly>
     </div>
 
     <div class="seccion-lideres">
@@ -49,25 +41,19 @@
             <input type="checkbox" id="check-h" class="check-oculto" onclick="toggleNivel('check-h', 'n-h')">
             <label for="check-h" class="boton-check"></label>
             <label for="check-h" style="flex-grow:1; cursor:pointer;">Hero</label>
-            <input type="number" id="n-h" class="nivel-input" placeholder="Lvl 1-600" min="1" max="600">
+            <input type="number" id="n-h" class="nivel-input" placeholder="Lvl" min="1">
         </div>
         <div class="lider-fila">
             <input type="checkbox" id="check-c1" class="check-oculto" onclick="toggleNivel('check-c1', 'n-c1')">
             <label for="check-c1" class="boton-check"></label>
             <label for="check-c1" style="flex-grow:1; cursor:pointer;">Captain 1</label>
-            <input type="number" id="n-c1" class="nivel-input" placeholder="Lvl 1-600" min="1" max="600">
+            <input type="number" id="n-c1" class="nivel-input" placeholder="Lvl" min="1">
         </div>
         <div class="lider-fila">
             <input type="checkbox" id="check-c2" class="check-oculto" onclick="toggleNivel('check-c2', 'n-c2')">
             <label for="check-c2" class="boton-check"></label>
             <label for="check-c2" style="flex-grow:1; cursor:pointer;">Captain 2</label>
-            <input type="number" id="n-c2" class="nivel-input" placeholder="Lvl 1-600" min="1" max="600">
-        </div>
-        <div class="lider-fila">
-            <input type="checkbox" id="check-c3" class="check-oculto" onclick="toggleNivel('check-c3', 'n-c3')">
-            <label for="check-c3" class="boton-check"></label>
-            <label for="check-c3" style="flex-grow:1; cursor:pointer;">Captain 3</label>
-            <input type="number" id="n-c3" class="nivel-input" placeholder="Lvl 1-600" min="1" max="600">
+            <input type="number" id="n-c2" class="nivel-input" placeholder="Lvl" min="1">
         </div>
     </div>
 
@@ -95,31 +81,47 @@
 </div>
 
 <script>
+    const datosTropas = {
+        "Guards": { "Mounted": 1265, "Flying": 12640, "Melee/Ranged": 630 },
+        "Specialists": { "Mounted": 1390, "Flying/Melee/Ranged": 695, "Scouts": 6320 },
+        "Siege": { "Default": 3475 },
+        "Monsters": { "T-III": 4000, "T-IV": 8000, "T-V": 12000, "T-VI": 18000, "T-VII": 24000, "T-I": 29000, "T-II": 32000 },
+        "Temp Mercenaries": { 
+            "G-Mounted": 2530, "G-Flying": 25300, "G-Melee/Ranged": 1265,
+            "S-Mounted": 2780, "S-Flying": 27800, "S-Melee/Ranged": 1390, "S-Scouts": 6950,
+            "Siege": 12650, "M-Mounted": 5300, "M-Flying": 7585, "M-Melee": 5000 
+        }
+    };
+
     function toggleNivel(checkId, inputId) {
         const input = document.getElementById(inputId);
-        const isChecked = document.getElementById(checkId).checked;
-        input.style.display = isChecked ? "block" : "none";
-        if (!isChecked) input.value = "";
+        input.style.display = document.getElementById(checkId).checked ? "block" : "none";
     }
 
-    // ARREGLADO: Función de tropas
     function agregarFilaTropa() {
         const container = document.getElementById('contenedor-tropas');
         const div = document.createElement('div');
         div.className = 'fila';
+        let cats = Object.keys(datosTropas).map(c => `<option value="${c}">${c}</option>`).join('');
         div.innerHTML = `
-            <select class="tropa-tipo">
-                <option value="40">Spy (40 silver)</option>
-                <option value="100">Caravan (100 silver)</option>
-                <option value="150">Engineer (150 silver)</option>
+            <select onchange="actualizarSub(this)">
+                <option value="">Category</option>${cats}
             </select>
-            <input type="number" class="cant-tropa" placeholder="Quantity" min="0">
-            <button style="background:none; border:none; color:#ff4444; cursor:pointer; font-size:1.2em;" onclick="this.parentElement.remove()">❌</button>
+            <select class="tropa-tipo" style="display:none;"></select>
+            <input type="number" class="cant-tropa" placeholder="Qty" min="0">
+            <button onclick="this.parentElement.remove()">❌</button>
         `;
         container.appendChild(div);
     }
 
-    // ARREGLADO: Función de recursos
+    function actualizarSub(s) {
+        const sub = s.parentElement.querySelector('.tropa-tipo');
+        if(s.value) {
+            sub.innerHTML = Object.entries(datosTropas[s.value]).map(([n,v])=>`<option value="${v}">${n}</option>`).join('');
+            sub.style.display = "block";
+        }
+    }
+
     function agregarFilaRecurso() {
         const container = document.getElementById('contenedor-recursos');
         const div = document.createElement('div');
@@ -131,49 +133,50 @@
                 <option value="oro">Gold</option>
             </select>
             <input type="number" class="res-cant" placeholder="Amount" min="0">
-            <button style="background:none; border:none; color:#ff4444; cursor:pointer; font-size:1.2em;" onclick="this.parentElement.remove()">❌</button>
+            <button onclick="this.parentElement.remove()">❌</button>
         `;
         container.appendChild(div);
     }
 
     function calcular() {
-        let totalOro = 200000 / 3000;
+        let silverTotal = 5000000;
 
-        ['n-h', 'n-c1', 'n-c2', 'n-c3'].forEach(id => {
+        // Líderes: 3000 plata por nivel
+        ['n-h', 'n-c1', 'n-c2'].forEach(id => {
             let el = document.getElementById(id);
-            if (el && el.style.display === "block") {
-                let val = parseInt(el.value) || 0;
-                totalOro += Math.min(val, 600);
-            }
+            if (el && el.style.display === "block") silverTotal += (parseInt(el.value) || 0) * 3000;
         });
 
-        document.querySelectorAll('#contenedor-recursos .fila').forEach(fila => {
-            let cant = parseInt(fila.querySelector('.res-cant').value) || 0;
-            let tipo = fila.querySelector('.res-tipo').value;
-            if (tipo === "plata") totalOro += (cant / 3000);
-            if (tipo === "tar") totalOro += (cant * 1.5);
-            if (tipo === "oro") totalOro += cant;
+        // Tropas: Suma directa de plata del selector
+        document.querySelectorAll('#contenedor-tropas .fila').forEach(f => {
+            let cant = parseInt(f.querySelector('.cant-tropa').value) || 0;
+            let val = parseInt(f.querySelector('.tropa-tipo').value) || 0;
+            silverTotal += (cant * val);
         });
 
-        document.querySelectorAll('#contenedor-tropas .fila').forEach(fila => {
-            let cant = parseInt(fila.querySelector('.cant-tropa').value) || 0;
-            let costePlata = parseInt(fila.querySelector('.tropa-tipo').value);
-            totalOro += (cant * 0.9 * costePlata * 5) / 3000;
-            totalOro += (cant * 0.1 * 1 * 5);
+        // Recursos
+        document.querySelectorAll('#contenedor-recursos .fila').forEach(f => {
+            let cant = parseInt(f.querySelector('.res-cant').value) || 0;
+            let tipo = f.querySelector('.res-tipo').value;
+            if (tipo === "plata") silverTotal += cant;
+            if (tipo === "tar") silverTotal += (cant * 1.5 * 3000);
+            if (tipo === "oro") silverTotal += (cant * 3000);
         });
 
         const modo = document.querySelector('input[name="moneda"]:checked').value;
-        const resultLabel = document.getElementById('total-final');
-        const typeLabel = document.getElementById('tipo-texto');
+        const res = document.getElementById('total-final');
+        const txt = document.getElementById('tipo-texto');
 
         if (modo === "plata") {
-            resultLabel.innerText = Math.round(totalOro * 3000).toLocaleString();
-            typeLabel.innerText = "silver";
+            res.innerText = Math.round(silverTotal).toLocaleString();
+            txt.innerText = "silver";
         } else {
-            resultLabel.innerText = Math.round(totalOro).toLocaleString();
-            typeLabel.innerText = "gold coins";
+            res.innerText = Math.round(silverTotal / 3000).toLocaleString();
+            txt.innerText = "gold coins";
         }
     }
 </script>
+</body>
+</html>
 </body>
 </html>
