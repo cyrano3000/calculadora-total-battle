@@ -1,9 +1,16 @@
+¡Excelente! He añadido el espacio para el Capitán 3 en la sección de líderes y he actualizado la función de cálculo para que lo tome en cuenta.
+
+Ahora el programa suma los niveles del Héroe y de los 3 Capitanes posibles, multiplicando cada nivel por 3,000 de plata (o 1 de oro).
+
+Aquí tienes el código actualizado:
+
+HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FobS Compensation Calculator</title>
+    <title>FobS Compensation Calculator - 3 Captains</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 700px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 25px; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
@@ -54,6 +61,12 @@
             <label for="check-c2" class="boton-check"></label>
             <label for="check-c2" style="flex-grow:1; cursor:pointer;">Captain 2</label>
             <input type="number" id="n-c2" class="nivel-input" placeholder="Lvl" min="1">
+        </div>
+        <div class="lider-fila">
+            <input type="checkbox" id="check-c3" class="check-oculto" onclick="toggleNivel('check-c3', 'n-c3')">
+            <label for="check-c3" class="boton-check"></label>
+            <label for="check-c3" style="flex-grow:1; cursor:pointer;">Captain 3</label>
+            <input type="number" id="n-c3" class="nivel-input" placeholder="Lvl" min="1">
         </div>
     </div>
 
@@ -141,20 +154,18 @@
     function calcular() {
         let silverTotal = 5000000;
 
-        // Líderes: 3000 plata por nivel
-        ['n-h', 'n-c1', 'n-c2'].forEach(id => {
+        // Líderes: 3000 plata por nivel (Héroe + 3 Capitanes)
+        ['n-h', 'n-c1', 'n-c2', 'n-c3'].forEach(id => {
             let el = document.getElementById(id);
             if (el && el.style.display === "block") silverTotal += (parseInt(el.value) || 0) * 3000;
         });
 
-        // Tropas: Suma directa de plata del selector
         document.querySelectorAll('#contenedor-tropas .fila').forEach(f => {
             let cant = parseInt(f.querySelector('.cant-tropa').value) || 0;
             let val = parseInt(f.querySelector('.tropa-tipo').value) || 0;
             silverTotal += (cant * val);
         });
 
-        // Recursos
         document.querySelectorAll('#contenedor-recursos .fila').forEach(f => {
             let cant = parseInt(f.querySelector('.res-cant').value) || 0;
             let tipo = f.querySelector('.res-tipo').value;
@@ -176,7 +187,5 @@
         }
     }
 </script>
-</body>
-</html>
 </body>
 </html>
