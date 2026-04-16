@@ -3,27 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FobS Compensation Calculator - Final GitHub Version</title>
+    <title>FobS Compensation Calculator - Official Multi-Resource</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .contenedor { max-width: 800px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
+        .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
         h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding-top: 5px; padding-bottom: 5px; }
-        .campo-fijo { background: #120c08; color: #7a6b5d; border: 1px solid #443322; padding: 12px; border-radius: 6px; width: 100%; font-weight: bold; cursor: not-allowed; box-sizing: border-box; }
-        select, input[type="number"] { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; flex-grow: 1; }
+        
+        .seccion-recursos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .recurso-item { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; text-align: center; }
+        .recurso-item label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #d4af37; }
+
+        input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
         .lider-fila { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #3d2b1f; }
         .check-oculto { display: none; }
-        .boton-check { width: 24px; height: 24px; border: 2px solid #d4af37; border-radius: 4px; display: inline-block; cursor: pointer; background: #1a110a; position: relative; }
+        .boton-check { width: 24px; height: 24px; border: 2px solid #d4af37; border-radius: 4px; display: inline-block; cursor: pointer; background: #1a110a; position: relative; flex-shrink: 0; }
         .check-oculto:checked + .boton-check { background: #4a7c44; border-color: #76b06d; }
         .check-oculto:checked + .boton-check::after { content: '✔'; color: white; position: absolute; left: 4px; top: -2px; font-size: 18px; }
         .nivel-input { display: none; width: 100px; text-align: center; border: 1px solid #d4af37; }
+        
         .fila { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         .total-box { margin-top: 35px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3em; color: #d4af37; font-weight: bold; display: block; }
         .btn-calc { background: #8b5a2b; color: white; border: none; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.2em; text-transform: uppercase; transition: 0.3s; }
         .btn-calc:hover { background: #a67341; }
-        .btn-del { background: none; border: none; color: #ff4444; cursor: pointer; font-size: 1.4em; }
     </style>
 </head>
 <body>
@@ -32,8 +36,21 @@
     <h2>### Registered Attack Report ###</h2>
 
     <div class="seccion">
-        <h3>*BASE FINE*</h3>
-        <input type="text" value="5,000,000 Silver" class="campo-fijo" readonly>
+        <h3>*STOLEN RESOURCES*</h3>
+        <div class="seccion-recursos">
+            <div class="recurso-item">
+                <label>Silver Stolen</label>
+                <input type="number" id="stolen-silver" placeholder="Amount" min="0">
+            </div>
+            <div class="recurso-item">
+                <label>Gold Stolen</label>
+                <input type="number" id="stolen-gold" placeholder="Amount" min="0">
+            </div>
+            <div class="recurso-item">
+                <label>TAR Stolen</label>
+                <input type="number" id="stolen-tar" placeholder="Amount" min="0">
+            </div>
+        </div>
     </div>
 
     <div class="seccion">
@@ -68,35 +85,14 @@
 
 <script>
     const datosTropas = {
-        "Guards": { 
-            "Mounted": 1250, 
-            "Flying": 12500, 
-            "Melee/Ranged": 625 
-        },
-        "Specialists": { 
-            "Mounted": 1400, 
-            "Flying/Melee/Ranged": 700, 
-            "Scouts": 3500 
-        },
-        "Siege": { 
-            "Default": 6250 
-        },
-        "Monsters": { 
-            "Tier III": 4000, "Tier IV": 8000, "Tier V": 12000, 
-            "Tier VI": 18000, "Tier VII": 24000, "Tier I": 29000, "Tier II": 32000 
-        },
+        "Guards": { "Mounted": 1250, "Flying": 12500, "Melee/Ranged": 625 },
+        "Specialists": { "Mounted": 1400, "Flying/Melee/Ranged": 700, "Scouts": 3500 },
+        "Siege": { "Default": 6250 },
+        "Monsters": { "Tier III": 4000, "Tier IV": 8000, "Tier V": 12000, "Tier VI": 18000, "Tier VII": 24000, "Tier I": 29000, "Tier II": 32000 },
         "Temp Mercenaries": { 
-            "Guard: Mounted": 2500, 
-            "Guard: Flying": 25000, 
-            "Guard: Melee/Ranged": 1250,
-            "Spec: Mounted": 2800, 
-            "Spec: Flying": 28000, 
-            "Spec: Melee/Ranged": 1400, 
-            "Spec: Scouts": 7000,
-            "Siege": 12500, 
-            "Monster: Mounted": 5300, 
-            "Monster: Flying": 7600, 
-            "Monster: Melee/Ranged": 5000 
+            "Guard: Mounted": 2500, "Guard: Flying": 25000, "Guard: Melee/Ranged": 1250,
+            "Spec: Mounted": 2800, "Spec: Flying": 28000, "Spec: Melee/Ranged": 1400, "Spec: Scouts": 7000,
+            "Siege": 12500, "Monster: Mounted": 5300, "Monster: Flying": 7600, "Monster: Melee/Ranged": 5000 
         }
     };
 
@@ -114,7 +110,7 @@
             <select onchange="actualizarSub(this)"><option value="">Category</option>${cats}</select>
             <select class="tropa-tipo" style="display:none;"></select>
             <input type="number" class="cant-tropa" placeholder="Qty" min="0">
-            <button class="btn-del" onclick="this.parentElement.remove()">❌</button>
+            <button onclick="this.parentElement.remove()" style="background:none; border:none; color:#ff4444; cursor:pointer; font-size:1.2em;">❌</button>
         `;
         container.appendChild(div);
     }
@@ -128,16 +124,30 @@
     }
 
     function calcular() {
-        let totalPlata = 5000000;
+        let totalPlata = 5000000; // Base Portal 5M
+        
+        // Recursos Robados
+        const sPlata = parseInt(document.getElementById('stolen-silver').value) || 0;
+        const sOro = parseInt(document.getElementById('stolen-gold').value) || 0;
+        const sTar = parseInt(document.getElementById('stolen-tar').value) || 0;
+        
+        totalPlata += sPlata;
+        totalPlata += (sOro * 3000); // 1 oro = 3000 plata
+        totalPlata += (sTar * 1.5 * 3000); // 1 TAR = 1.5 oro = 4500 plata
+
+        // Lideres (3000 plata por nivel)
         ['n-h', 'n-c1', 'n-c2', 'n-c3'].forEach(id => {
             let el = document.getElementById(id);
             if(el && el.style.display === "block") totalPlata += (parseInt(el.value) || 0) * 3000;
         });
+
+        // Tropas
         document.querySelectorAll('.fila').forEach(f => {
             let cant = parseInt(f.querySelector('.cant-tropa').value) || 0;
             let val = parseInt(f.querySelector('.tropa-tipo').value) || 0;
             totalPlata += (cant * val);
         });
+
         const oro = document.querySelector('input[name="moneda"]:checked').value === "oro";
         document.getElementById('total-final').innerText = Math.round(oro ? totalPlata/3000 : totalPlata).toLocaleString();
         document.getElementById('tipo-texto').innerText = oro ? "gold coins" : "silver";
