@@ -1,80 +1,104 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FobS Compensation Calculator - Official Clan Edition</title>
+    <title>FobS Compensation Calculator - V4 Final</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
         h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         
-        .grid-input { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid #3d2b1f; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        .input-group label { font-size: 0.85em; color: #d4af37; font-weight: bold; }
-
-        input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 12px; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        /* Sección de Recursos y Clan */
+        .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 10px; margin-bottom: 15px; }
+        .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
+        .caja-input label { display: block; color: #d4af37; font-size: 0.85em; font-weight: bold; margin-bottom: 5px; }
         
-        .opcion-check { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #3d2b1f; }
+        input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        
+        /* Checkboxes Personalizados */
+        .fila-check { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #3d2b1f; margin-bottom: 8px; }
         .check-oculto { display: none; }
         .boton-check { width: 24px; height: 24px; border: 2px solid #d4af37; border-radius: 4px; cursor: pointer; background: #1a110a; position: relative; flex-shrink: 0; }
         .check-oculto:checked + .boton-check { background: #4a7c44; border-color: #76b06d; }
         .check-oculto:checked + .boton-check::after { content: '✔'; color: white; position: absolute; left: 4px; top: -2px; font-size: 18px; }
-
-        .fila-tropa { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; }
-        .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
         
+        .nivel-lider { display: none; width: 80px; text-align: center; }
+        .fila-tropa { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; }
+        
+        /* Totales */
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
-        .btn-calc { background: #8b5a2b; color: white; border: none; padding: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.2em; text-transform: uppercase; margin-top: 10px; }
+        .btn-calc { background: #8b5a2b; color: white; border: none; padding: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.2em; text-transform: uppercase; margin-top: 15px; }
+        .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="contenedor">
-    <h2>### Attack Report Calculator ###</h2>
+    <h2>### Attack Compensation Calculator ###</h2>
 
-    <h3>1. Stolen Resources & Portal</h3>
-    <div class="grid-input">
-        <div class="input-group"><label>Silver Stolen</label><input type="number" id="rob-silver" placeholder="0"></div>
-        <div class="input-group"><label>Gold Stolen</label><input type="number" id="rob-gold" placeholder="0"></div>
-        <div class="input-group"><label>TAR Stolen</label><input type="number" id="rob-tar" placeholder="0"></div>
+    <h3>1. Stolen Resources</h3>
+    <div class="grid-triple">
+        <div class="caja-input">
+            <label>Silver Stolen</label>
+            <input type="number" id="rob-silver" placeholder="0">
+        </div>
+        <div class="caja-input">
+            <label>Gold Stolen</label>
+            <input type="number" id="rob-gold" placeholder="0">
+        </div>
+        <div class="caja-input">
+            <label>TAR (Oil) Stolen</label>
+            <input type="number" id="rob-tar" placeholder="0">
+        </div>
     </div>
-    <div class="opcion-check" style="margin-top:10px;">
+
+    <h3>2. Clan Buildings & Portal</h3>
+    <div class="fila-check">
         <input type="checkbox" id="check-portal" class="check-oculto">
         <label for="check-portal" class="boton-check"></label>
-        <label for="check-portal" style="flex-grow:1; cursor:pointer;">Portal Destroyed (+5M Silver)</label>
+        <label for="check-portal" style="flex-grow:1; cursor:pointer; font-weight:bold;">Portal Destroyed (+5,000,000 Silver)</label>
     </div>
-
-    <h3>2. Clan Buildings & Structures</h3>
-    <div class="grid-input">
-        <div class="input-group"><label>City Walls Lvl (1M/lvl)</label><input type="number" id="wall-lvl" placeholder="0"></div>
-        <div class="input-group"><label>Fortress Lvl (50M/lvl)</label><input type="number" id="fort-lvl" placeholder="0"></div>
-        <div class="input-group"><label>Capital Lvl (450M/lvl)</label><input type="number" id="cap-lvl" placeholder="0"></div>
+    
+    <div class="grid-triple">
+        <div class="caja-input">
+            <label>City Walls Lvl (1M/lvl)</label>
+            <input type="number" id="wall-lvl" placeholder="Lvl">
+        </div>
+        <div class="caja-input" style="border: 1px solid #d4af37; background: rgba(212,175,55,0.05);">
+            <label style="color:#fff;">Fortress Lvl (50M/lvl)</label>
+            <input type="number" id="fort-lvl" placeholder="Lvl">
+        </div>
+        <div class="caja-input" style="border: 1px solid #d4af37; background: rgba(212,175,55,0.05);">
+            <label style="color:#fff;">Capital Lvl (450M/lvl)</label>
+            <input type="number" id="cap-lvl" placeholder="Lvl">
+        </div>
     </div>
 
     <h3>3. Leaders Status</h3>
-    <div class="opcion-check">
-        <input type="checkbox" id="c-h" class="check-oculto" onclick="document.getElementById('n-h').style.display = this.checked ? 'block' : 'none'">
-        <label for="c-h" class="boton-check"></label><label style="flex-grow:1;">Hero (3k/lvl)</label>
-        <input type="number" id="n-h" style="display:none; width:80px;" placeholder="Lvl">
-    </div>
-    <div class="opcion-check">
-        <input type="checkbox" id="c-c1" class="check-oculto" onclick="document.getElementById('n-c1').style.display = this.checked ? 'block' : 'none'">
-        <label for="c-c1" class="boton-check"></label><label style="flex-grow:1;">Captain 1</label>
-        <input type="number" id="n-c1" style="display:none; width:80px;" placeholder="Lvl">
-    </div>
-    <div class="opcion-check">
-        <input type="checkbox" id="c-c2" class="check-oculto" onclick="document.getElementById('n-c2').style.display = this.checked ? 'block' : 'none'">
-        <label for="c-c2" class="boton-check"></label><label style="flex-grow:1;">Captain 2</label>
-        <input type="number" id="n-c2" style="display:none; width:80px;" placeholder="Lvl">
-    </div>
-    <div class="opcion-check">
-        <input type="checkbox" id="c-c3" class="check-oculto" onclick="document.getElementById('n-c3').style.display = this.checked ? 'block' : 'none'">
-        <label for="c-c3" class="boton-check"></label><label style="flex-grow:1;">Captain 3</label>
-        <input type="number" id="n-c3" style="display:none; width:80px;" placeholder="Lvl">
+    <div id="seccion-lideres">
+        <div class="fila-check">
+            <input type="checkbox" id="c-h" class="check-oculto" onclick="document.getElementById('n-h').style.display = this.checked ? 'block' : 'none'">
+            <label for="c-h" class="boton-check"></label><label style="flex-grow:1;">Hero (3k/lvl)</label>
+            <input type="number" id="n-h" class="nivel-lider" placeholder="Lvl">
+        </div>
+        <div class="fila-check">
+            <input type="checkbox" id="c-c1" class="check-oculto" onclick="document.getElementById('n-c1').style.display = this.checked ? 'block' : 'none'">
+            <label for="c-c1" class="boton-check"></label><label style="flex-grow:1;">Captain 1</label>
+            <input type="number" id="n-c1" class="nivel-lider" placeholder="Lvl">
+        </div>
+        <div class="fila-check">
+            <input type="checkbox" id="c-c2" class="check-oculto" onclick="document.getElementById('n-c2').style.display = this.checked ? 'block' : 'none'">
+            <label for="c-c2" class="boton-check"></label><label style="flex-grow:1;">Captain 2</label>
+            <input type="number" id="n-c2" class="nivel-lider" placeholder="Lvl">
+        </div>
+        <div class="fila-check">
+            <input type="checkbox" id="c-c3" class="check-oculto" onclick="document.getElementById('n-c3').style.display = this.checked ? 'block' : 'none'">
+            <label for="c-c3" class="boton-check"></label><label style="flex-grow:1;">Captain 3</label>
+            <input type="number" id="n-c3" class="nivel-lider" placeholder="Lvl">
+        </div>
     </div>
 
     <h3>4. Unit Losses</h3>
@@ -93,15 +117,16 @@
 </div>
 
 <script>
+    // Valores actualizados según imágenes
     const DB = {
-        "Guards": { "Mounted": 1250, "Flying": 12500, "Melee/Ranged": 625 },
-        "Specialists": { "Mounted": 1400, "Flying/Melee/Ranged": 700, "Scouts": 3500 },
-        "Siege": { "Default": 6250 },
-        "Monsters": { "T-III": 4000, "T-IV": 8000, "T-V": 12000, "T-VI": 18000, "T-VII": 24000, "T-I": 29000, "T-II": 32000 },
+        "Guards": { "Mounted": 1265, "Flying": 12640, "Melee/Ranged": 630 },
+        "Specialists": { "Mounted": 1390, "Flying/Melee/Ranged": 695, "Scouts": 6320 },
+        "Siege": { "Default Units": 3475 },
+        "Monsters": { "Tier III": 4000, "Tier IV": 8000, "Tier V": 12000, "Tier VI": 18000, "Tier VII": 24000, "Tier I": 29000, "Tier II": 32000 },
         "Temp Mercs": { 
-            "G-Mounted": 2500, "G-Flying": 25000, "G-Melee": 1250,
-            "S-Mounted": 2800, "S-Flying": 28000, "S-Melee": 1400, "S-Scout": 7000,
-            "Siege": 12500, "M-Mounted": 5300, "M-Flying": 7600, "M-Melee": 5000 
+            "G-Mounted": 2530, "G-Flying": 25300, "G-Melee/Ranged": 1265,
+            "S-Mounted": 2780, "S-Flying": 27800, "S-Melee/Ranged": 1390, "S-Scouts": 6950,
+            "Siege": 12650, "Monster: Mounted": 5300, "Monster: Flying": 7585, "Monster: Melee/Ranged": 5000 
         }
     };
 
@@ -112,14 +137,14 @@
         div.innerHTML = `<select onchange="updateSub(this)"><option value="">Category</option>${opt}</select>
             <select class="sub-t" style="display:none"></select>
             <input type="number" class="qty" placeholder="Qty">
-            <button onclick="this.parentElement.remove()" style="color:red; background:none; border:none; cursor:pointer;">✖</button>`;
+            <button onclick="this.parentElement.remove()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">✖</button>`;
         document.getElementById('lista-tropas').appendChild(div);
     }
 
     function updateSub(sel) {
         const sub = sel.parentElement.querySelector('.sub-t');
         if(sel.value) {
-            sub.innerHTML = Object.entries(DB[sel.value]).map(([n,v])=>`<option value="${v}">${n}</option>`).join('');
+            sub.innerHTML = Object.entries(DB[sel.value]).map(([n,v])=>`<option value="${v}">${n} (${v})</option>`).join('');
             sub.style.display = "block";
         }
     }
@@ -127,24 +152,24 @@
     function calcular() {
         let silver = 0;
         
-        // Recursos y Portal
+        // 1. Robo
         silver += (parseInt(document.getElementById('rob-silver').value) || 0);
         silver += (parseInt(document.getElementById('rob-gold').value) || 0) * 3000;
         silver += (parseInt(document.getElementById('rob-tar').value) || 0) * 4500;
-        if(document.getElementById('check-portal').checked) silver += 5000000;
         
-        // Estructuras y Edificios de Clan
+        // 2. Portal y Edificios
+        if(document.getElementById('check-portal').checked) silver += 5000000;
         silver += (parseInt(document.getElementById('wall-lvl').value) || 0) * 1000000;
         silver += (parseInt(document.getElementById('fort-lvl').value) || 0) * 50000000;
         silver += (parseInt(document.getElementById('cap-lvl').value) || 0) * 450000000;
 
-        // Lideres
+        // 3. Lideres
         ['n-h','n-c1','n-c2','n-c3'].forEach(id => {
             let el = document.getElementById(id);
-            if(el.style.display === 'block') silver += (parseInt(el.value) || 0) * 3000;
+            if(el && el.style.display === 'block') silver += (parseInt(el.value) || 0) * 3000;
         });
 
-        // Tropas
+        // 4. Tropas
         document.querySelectorAll('.fila-tropa').forEach(f => {
             silver += (parseInt(f.querySelector('.qty').value) || 0) * (parseInt(f.querySelector('.sub-t').value) || 0);
         });
