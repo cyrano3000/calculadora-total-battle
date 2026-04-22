@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FobS Global Calculator - V15 Export</title>
+    <title>FobS Global Calculator - V16 Dual Export</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -18,8 +18,7 @@
         input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
-        .btn-calc { background: #8b5a2b; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        .btn-share { background: #d4af37; color: #1a110a; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; text-transform: uppercase; }
+        .btn-share { background: #d4af37; color: #1a110a; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; text-transform: uppercase; }
         .fila-check { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #3d2b1f; margin-bottom: 8px; }
     </style>
 </head>
@@ -61,74 +60,122 @@
     </div>
 
     <div class="total-box">
-        <input type="radio" name="m" value="o" id="m-o" checked onchange="calcular()"> <label for="m-o" id="lbl-gold">Gold</label>
+        <div>
+            <input type="radio" name="m" value="p" id="m-p" onchange="calcular()"> <label for="m-p" id="lbl-silver-radio">Silver</label>
+            <input type="radio" name="m" value="o" id="m-o" checked onchange="calcular()"> <label for="m-o" id="lbl-gold-radio">Gold</label>
+        </div>
         <span id="total-final">0</span>
-        <button class="btn-share" id="btn-share" onclick="compartir()">Generate Summary for Share</button>
+        <small id="txt-moneda-label">gold coins</small>
+        <button class="btn-share" id="btn-share" onclick="compartir()">Generate Summary</button>
     </div>
 </div>
 
 <script>
     const i18n = {
-        en: { titulo: "Compensation Calculator", secLideres: "1. Captured Leaders", secTropas: "2. Unit Losses", secRecursos: "3. Stolen Resources", secClan: "4. Clan Buildings", btnAddLider: "+ Add Leader", btnAddTropa: "+ Add Unit Row", btnAddRecurso: "+ Add Resource", lblPortal: "Portal Destroyed", lblWall: "City Walls", lblFort: "Fortress", lblCap: "Capital", btnShare: "Generate Summary", shareTitle: "--- COMPENSATION SUMMARY ---", her: "Hero", cap: "Captain", qty: "Qty", total: "Total", units: { "Guards": "Guards", "Specialists": "Specialists", "Mounted": "Mounted" } },
-        es: { titulo: "Calculadora de Compensación", secLideres: "1. Líderes Capturados", secTropas: "2. Pérdidas de Tropas", secRecursos: "3. Recursos Robados", secClan: "4. Edificios de Clan", btnAddLider: "+ Añadir Líder", btnAddTropa: "+ Añadir Tropa", btnAddRecurso: "+ Añadir Recurso", lblPortal: "Portal Destruido", lblWall: "Muros Ciudad", lblFort: "Fortaleza", lblCap: "Capital", btnShare: "Generar Resumen", shareTitle: "--- RESUMEN DE COMPENSACIÓN ---", her: "Héroe", cap: "Capitán", qty: "Cant", total: "Total", units: { "Guards": "Guardias", "Specialists": "Especialistas", "Mounted": "Montada" } }
+        en: { titulo: "Compensation Calculator", secLideres: "1. Captured Leaders", secTropas: "2. Unit Losses", secRecursos: "3. Stolen Resources", secClan: "4. Clan Buildings", btnAddLider: "+ Add Leader", btnAddTropa: "+ Add Unit Row", btnAddRecurso: "+ Add Resource", lblPortal: "Portal Destroyed", lblWall: "City Walls", lblFort: "Fortress", lblCap: "Capital", btnShare: "Generate Summary", shareTitle: "--- COMPENSATION SUMMARY ---", her: "Hero", cap: "Captain", qty: "Qty", silver: "Silver", gold: "Gold", goldCoins: "gold coins", units: { "Guards": "Guards", "Specialists": "Specialists", "Mounted": "Mounted", "Flying": "Flying", "Scouts": "Scouts" } },
+        es: { titulo: "Calculadora de Compensación", secLideres: "1. Líderes Capturados", secTropas: "2. Pérdidas de Tropas", secRecursos: "3. Recursos Robados", secClan: "4. Edificios de Clan", btnAddLider: "+ Añadir Líder", btnAddTropa: "+ Añadir Tropa", btnAddRecurso: "+ Añadir Recurso", lblPortal: "Portal Destruido", lblWall: "Muros Ciudad", lblFort: "Fortaleza", lblCap: "Capital", btnShare: "Generar Resumen", shareTitle: "--- RESUMEN DE COMPENSACIÓN ---", her: "Héroe", cap: "Capitán", qty: "Cant", silver: "Plata", gold: "Oro", goldCoins: "monedas de oro", units: { "Guards": "Guardias", "Specialists": "Especialistas", "Mounted": "Montada", "Flying": "Voladora", "Scouts": "Exploradores" } }
     };
 
     let idm = 'en';
-    const DB_T = { "Guards": { "Mounted": 1265, "Flying": 12640 }, "Specialists": { "Mounted": 1390, "Scouts": 6320 } };
+    const DB_T = { 
+        "Guards": { "Mounted": 1265, "Flying": 12640, "Melee/Ranged": 630 },
+        "Specialists": { "Mounted": 1390, "Flying/Melee/Ranged": 695, "Scouts": 6320 }
+    };
 
     function cambiarIdioma() {
         idm = document.getElementById('select-idioma').value;
         const t = i18n[idm] || i18n['en'];
         document.getElementById('txt-titulo').innerText = t.titulo;
         document.getElementById('btn-share').innerText = t.btnShare;
-        // ... (resto de etiquetas)
+        document.getElementById('lbl-silver-radio').innerText = t.silver;
+        document.getElementById('lbl-gold-radio').innerText = t.gold;
+        // Reiniciar listas para evitar inconsistencias
+        document.getElementById('lista-lideres').innerHTML = '';
+        document.getElementById('lista-tropas').innerHTML = '';
+        document.getElementById('lista-recursos').innerHTML = '';
+        calcular();
     }
 
     function nuevoLider() {
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `<select class="sel-lider"><option value="3000">${i18n[idm].her}</option></select><input type="number" class="lvl-lider" value="1" oninput="calcular()">
-        <button onclick="this.parentElement.remove(); calcular();">✖</button>`;
+        div.innerHTML = `<select class="sel-lider"><option value="3000">${i18n[idm].her}</option><option value="3000">${i18n[idm].cap}</option></select>
+        <input type="number" class="lvl-lider" value="1" min="1" oninput="calcular()">
+        <button onclick="this.parentElement.remove(); calcular();" style="color:red; background:none; border:none;">✖</button>`;
         document.getElementById('lista-lideres').appendChild(div);
+        calcular();
     }
 
     function nuevaFilaTropa() {
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `<select onchange="updateSub(this)"><option value="">Cat</option>${Object.keys(DB_T).map(c=>`<option value="${c}">${c}</option>`)}</select>
-        <select class="sub-t" onchange="calcular()"></select><input type="number" class="qty" placeholder="Qty" oninput="calcular()">
-        <button onclick="this.parentElement.remove(); calcular();">✖</button>`;
+        const cats = Object.keys(DB_T).map(c => `<option value="${c}">${i18n[idm].units[c] || c}</option>`).join('');
+        div.innerHTML = `<select onchange="updateSub(this)"><option value="">Cat</option>${cats}</select>
+        <select class="sub-t" style="display:none" onchange="calcular()"></select>
+        <input type="number" class="qty" placeholder="${i18n[idm].qty}" min="1" oninput="calcular()">
+        <button onclick="this.parentElement.remove(); calcular();" style="color:red; background:none; border:none;">✖</button>`;
         document.getElementById('lista-tropas').appendChild(div);
     }
 
     function updateSub(sel) {
         const sub = sel.parentElement.querySelector('.sub-t');
-        sub.innerHTML = Object.entries(DB_T[sel.value]).map(([n,v])=>`<option value="${v}">${n}</option>`);
+        if(sel.value) {
+            sub.innerHTML = Object.entries(DB_T[sel.value]).map(([n,v])=>`<option value="${v}">${i18n[idm].units[n] || n} (${v})</option>`).join('');
+            sub.style.display = "block";
+        } else {
+            sub.style.display = "none";
+        }
         calcular();
     }
 
+    function nuevoRecurso() {
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        div.innerHTML = `<select class="tipo-res"><option value="3000">${i18n[idm].gold}</option><option value="1">${i18n[idm].silver}</option></select>
+        <input type="number" class="qty-res" placeholder="${i18n[idm].qty}" min="1" oninput="calcular()">
+        <button onclick="this.parentElement.remove(); calcular();" style="color:red; background:none; border:none;">✖</button>`;
+        document.getElementById('lista-recursos').appendChild(div);
+    }
+
     function calcular() {
-        let total = 0;
-        document.querySelectorAll('.lvl-lider').forEach(i => total += (parseInt(i.value)||0)*3000);
+        let totalPlata = 0;
+        document.querySelectorAll('.lvl-lider').forEach(i => totalPlata += (parseInt(i.value)||0)*3000);
         document.querySelectorAll('.qty').forEach(i => {
             let v = parseInt(i.parentElement.querySelector('.sub-t').value)||0;
-            total += (parseInt(i.value)||0)*v;
+            totalPlata += (parseInt(i.value)||0)*v;
         });
-        document.getElementById('total-final').innerText = Math.round(total/3000).toLocaleString();
+        document.querySelectorAll('.qty-res').forEach(i => {
+            let v = parseInt(i.parentElement.querySelector('.tipo-res').value)||0;
+            totalPlata += (parseInt(i.value)||0)*v;
+        });
+        
+        if(document.getElementById('check-portal').checked) totalPlata += 5000000;
+        totalPlata += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
+        
+        const isGold = document.getElementById('m-o').checked;
+        document.getElementById('total-final').innerText = Math.round(isGold ? totalPlata/3000 : totalPlata).toLocaleString();
+        document.getElementById('txt-moneda-label').innerText = isGold ? i18n[idm].goldCoins : i18n[idm].silver;
+        return totalPlata;
     }
 
     function compartir() {
+        const plata = calcular();
+        const oro = Math.round(plata/3000);
         let txt = `${i18n[idm].shareTitle}\n\n`;
-        document.querySelectorAll('#lista-lideres .fila-dinamica').forEach(f => {
-            txt += `• Leader Lvl ${f.querySelector('.lvl-lider').value}\n`;
-        });
-        document.querySelectorAll('#lista-tropas .fila-dinamica').forEach(f => {
-            txt += `• ${f.querySelector('select').value}: ${f.querySelector('.qty').value} units\n`;
-        });
-        txt += `\nTOTAL: ${document.getElementById('total-final').innerText} GOLD`;
+        
+        // Desglose simplificado
+        const nLid = document.querySelectorAll('.lvl-lider').length;
+        if(nLid > 0) txt += `• Leaders: ${nLid}\n`;
+        
+        const nTro = document.querySelectorAll('.qty').length;
+        if(nTro > 0) txt += `• Unit Groups: ${nTro}\n`;
+
+        txt += `\n--- FINAL TOTAL ---\n`;
+        txt += `💰 ${oro.toLocaleString()} ${i18n[idm].gold.toUpperCase()}\n`;
+        txt += `🪙 ${plata.toLocaleString()} ${i18n[idm].silver.toUpperCase()}\n`;
         
         navigator.clipboard.writeText(txt);
-        alert("Summary copied to clipboard! Paste it to share.");
+        alert("Dual summary (Gold & Silver) copied to clipboard!");
     }
 </script>
 </body>
