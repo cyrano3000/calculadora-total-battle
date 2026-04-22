@@ -1,16 +1,9 @@
-¡Hecho! He perfeccionado la lógica de traducción para que no solo se traduzcan las categorías generales, sino también cada unidad específica dentro de los desplegables (como las variantes de Guardias, Especialistas y los Mercenarios Temporales que aparecen en tus capturas).
-
-He incluido una función de "traducción inteligente" que identifica prefijos como "G-" (Guardia) o "S-" (Especialista) y sufijos de tipo de movimiento para que todo aparezca perfectamente localizado en los 9 idiomas.
-
-Aquí tienes la Versión Final V11:
-
-HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FobS Global Calculator - V11 Final</title>
+    <title>FobS Global Calculator - V12 Fixed</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; transition: direction 0.3s; }
         .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -21,7 +14,6 @@ HTML
         [dir="rtl"] h3 { border-left: none; border-right: 5px solid #8b5a2b; padding-left: 0; padding-right: 15px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; margin-bottom: 15px; transition: 0.3s; }
-        .btn-add:hover { background: #5da356; }
         .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
         .caja-input label { display: block; color: #d4af37; font-size: 0.85em; font-weight: bold; margin-bottom: 5px; }
@@ -74,9 +66,9 @@ HTML
         <label for="check-portal" id="lbl-portal" style="flex-grow:1; cursor:pointer;">Portal Destruido (+5M Plata)</label>
     </div>
     <div class="grid-triple">
-        <div class="caja-input"><label id="lbl-wall">Muros Ciudad</label><input type="number" id="wall-lvl" min="0" max="45"></div>
-        <div class="caja-input"><label id="lbl-fort">Fortaleza</label><input type="number" id="fort-lvl" min="0" max="25"></div>
-        <div class="caja-input"><label id="lbl-cap">Capital</label><input type="number" id="cap-lvl" min="0" max="25"></div>
+        <div class="caja-input"><label id="lbl-wall">Muros Ciudad</label><input type="number" id="wall-lvl" min="0" max="45" placeholder="Nivel"></div>
+        <div class="caja-input"><label id="lbl-fort">Fortaleza</label><input type="number" id="fort-lvl" min="0" max="25" placeholder="Nivel"></div>
+        <div class="caja-input"><label id="lbl-cap">Capital</label><input type="number" id="cap-lvl" min="0" max="25" placeholder="Nivel"></div>
     </div>
 
     <div class="total-box">
@@ -92,15 +84,14 @@ HTML
 
 <script>
     const i18n = {
-        es: { titulo: "Calculadora de Compensación", secLideres: "1. Líderes Capturados", secTropas: "2. Pérdidas de Tropas", secRecursos: "3. Recursos Robados", secClan: "4. Edificios de Clan", btnAddLider: "+ Añadir Líder", btnAddTropa: "+ Añadir Tropa", btnAddRecurso: "+ Añadir Recurso", lblPortal: "Portal Destruido (+5M Plata)", lblWall: "Muros Ciudad", lblFort: "Fortaleza", lblCap: "Capital", mostrarComo: "Mostrar como:", btnCalc: "Calcular Compensación", monedaOro: "monedas de oro", monedaPlata: "plata", cat: "Categoría", cant: "Cant", her: "Héroe", cap: "Capitán", oro: "Oro", ace: "Aceite", pla: "Plata", pie: "Piedra", mad: "Madera", hie: "Hierro", rtl: false,
-              units: { "Guards": "Guardias", "Specialists": "Especialistas", "Siege": "Asedio", "Monsters": "Monstruos", "Temp Mercs": "Mercenarios Temporales", "Mounted": "Montada", "Flying": "Voladora", "Melee/Ranged": "Cuerpo a Cuerpo/Rango", "Scouts": "Exploradores", "Default Units": "Unidades Estándar", "Tier": "Rango", "G-": "G-", "S-": "E-" } },
+        es: { titulo: "Calculadora de Compensación", secLideres: "1. Líderes Capturados", secTropas: "2. Pérdidas de Tropas", secRecursos: "3. Recursos Robados", secClan: "4. Edificios de Clan", btnAddLider: "+ Añadir Líder", btnAddTropa: "+ Añadir Tropa", btnAddRecurso: "+ Añadir Recurso", lblPortal: "Portal Destruido (+5M Plata)", lblWall: "Muros Ciudad", lblFort: "Fortaleza", lblCap: "Capital", mostrarComo: "Mostrar como:", btnCalc: "Calcular Compensación", monedaOro: "monedas de oro", monedaPlata: "plata", cat: "Categoría", cant: "Cant", her: "Héroe", cap: "Capitán", oro: "Oro", ace: "Aceite (TAR)", pla: "Plata", pie: "Piedra", mad: "Madera", hie: "Hierro", rtl: false,
+              units: { "Guards": "Guardias", "Specialists": "Especialistas", "Siege": "Asedio", "Monsters": "Monstruos", "Temp Mercs": "Mercenarios Temporales", "Mounted": "Montada", "Flying": "Voladora", "Melee/Ranged": "Cuerpo a Cuerpo/Rango", "Flying/Melee/Ranged": "Voladora/Meele/Rango", "Scouts": "Exploradores", "Default Units": "Unidades Estándar", "Tier": "Rango", "G-": "G-", "S-": "E-" } },
         en: { titulo: "Compensation Calculator", secLideres: "1. Captured Leaders", secTropas: "2. Unit Losses", secRecursos: "3. Stolen Resources", secClan: "4. Clan Buildings", btnAddLider: "+ Add Leader", btnAddTropa: "+ Add Unit", btnAddRecurso: "+ Add Resource", lblPortal: "Portal Destroyed (+5M Silver)", lblWall: "City Walls", lblFort: "Fortress", lblCap: "Capital", mostrarComo: "Display as:", btnCalc: "Calculate Compensation", monedaOro: "gold coins", monedaPlata: "silver", cat: "Category", cant: "Qty", her: "Hero", cap: "Captain", oro: "Gold", ace: "TAR (Oil)", pla: "Silver", pie: "Stone", mad: "Wood", hie: "Iron", rtl: false,
-              units: { "Guards": "Guards", "Specialists": "Specialists", "Siege": "Siege", "Monsters": "Monsters", "Temp Mercs": "Temp Mercs", "Mounted": "Mounted", "Flying": "Flying", "Melee/Ranged": "Melee/Ranged", "Scouts": "Scouts", "Default Units": "Default Units", "Tier": "Tier", "G-": "G-", "S-": "S-" } },
+              units: { "Guards": "Guards", "Specialists": "Specialists", "Siege": "Siege", "Monsters": "Monsters", "Temp Mercs": "Temp Mercs", "Mounted": "Mounted", "Flying": "Flying", "Melee/Ranged": "Melee/Ranged", "Flying/Melee/Ranged": "Flying/Melee/Ranged", "Scouts": "Scouts", "Default Units": "Default Units", "Tier": "Tier", "G-": "G-", "S-": "S-" } },
         it: { titulo: "Calcolatore di Compensazione", secLideres: "1. Leader Catturati", secTropas: "2. Perdite di Truppe", secRecursos: "3. Risorse Rubate", secClan: "4. Edifici del Clan", btnAddLider: "+ Aggiungi Leader", btnAddTropa: "+ Aggiungi Truppa", btnAddRecurso: "+ Aggiungi Risorsa", lblPortal: "Portale Distrutto (+5M Argento)", lblWall: "Mura della Città", lblFort: "Fortezza", lblCap: "Capitale", mostrarComo: "Mostra come:", btnCalc: "Calcola Compensazione", monedaOro: "monete d'oro", monedaPlata: "argento", cat: "Categoria", cant: "Qta", her: "Eroe", cap: "Capitano", oro: "Oro", ace: "Olio (TAR)", pla: "Argento", pie: "Pietra", mad: "Legno", hie: "Ferro", rtl: false,
-              units: { "Guards": "Guardie", "Specialists": "Specialisti", "Siege": "Assedio", "Monsters": "Mostri", "Temp Mercs": "Mercenari Temporanei", "Mounted": "Cavalleria", "Flying": "Volante", "Melee/Ranged": "Mischia/Distanza", "Scouts": "Esploratori", "Default Units": "Unità Base", "Tier": "Livello", "G-": "G-", "S-": "S-" } },
+              units: { "Guards": "Guardie", "Specialists": "Spécialisti", "Siege": "Assedio", "Monsters": "Mostri", "Temp Mercs": "Mercenari Temporanei", "Mounted": "Cavalleria", "Flying": "Volante", "Melee/Ranged": "Mischia/Distanza", "Flying/Melee/Ranged": "Volante/Mischia/Distanza", "Scouts": "Esploratori", "Default Units": "Unità Base", "Tier": "Livello", "G-": "G-", "S-": "S-" } },
         ar: { titulo: "حاسبة التعويضات", secLideres: "1. القادة المأسورون", secTropas: "2. خسائر الوحدات", secRecursos: "3. الموارد المسروقة", secClan: "4. مباني القبيلة", btnAddLider: "+ إضافة قائد", btnAddTropa: "+ إضافة وحدة", btnAddRecurso: "+ إضافة مورد", lblPortal: "بوابة مدمرة (+5M فضة)", lblWall: "أسوار المدينة", lblFort: "الحصن", lblCap: "العاصمة", mostrarComo: "عرض كـ:", btnCalc: "احسب التعويض", monedaOro: "عملات ذهبية", monedaPlata: "فضة", cat: "الفئة", cant: "الكمية", her: "بطل", cap: "قائد", oro: "ذهب", ace: "نفط (TAR)", pla: "فضة", pie: "حجر", mad: "خشب", hie: "حديد", rtl: true,
-              units: { "Guards": "الحراس", "Specialists": "المتخصصون", "Siege": "الحصار", "Monsters": "الوحوش", "Temp Mercs": "مرتزقة مؤقتون", "Mounted": "فرسان", "Flying": "طيران", "Melee/Ranged": "اشتباك/رماة", "Scouts": "كشافة", "Default Units": "وحدات افتراضية", "Tier": "فئة", "G-": "ج-", "S-": "خ-" } }
-        // ... (otros idiomas siguen la misma estructura lógica)
+              units: { "Guards": "الحراس", "Specialists": "المتخصصون", "Siege": "الحصار", "Monsters": "الوحوش", "Temp Mercs": "مرتزقة مؤقتون", "Mounted": "فرسان", "Flying": "طيران", "Melee/Ranged": "اشتباك/رماة", "Flying/Melee/Ranged": "طيران/اشتباك/رماة", "Scouts": "كشافة", "Default Units": "وحدات افتراضية", "Tier": "فئة", "G-": "ج-", "S-": "خ-" } }
     };
 
     let idm = 'es';
@@ -135,7 +126,6 @@ HTML
         document.getElementById('lbl-silver').innerText = t.pla;
         document.getElementById('lbl-gold').innerText = t.oro;
         
-        // Limpiamos listas para aplicar traducciones nuevas en las opciones
         document.getElementById('lista-lideres').innerHTML = '';
         document.getElementById('lista-tropas').innerHTML = '';
         document.getElementById('lista-recursos').innerHTML = '';
@@ -144,22 +134,16 @@ HTML
 
     function traducirUnidad(nombreOriginal) {
         const u = i18n[idm].units;
-        let final = nombreOriginal;
-
-        // Traducir Tiers (Tier V -> Rango V)
-        if(final.includes("Tier")) final = final.replace("Tier", u["Tier"]);
+        if(u[nombreOriginal]) return u[nombreOriginal];
         
-        // Traducir Prefijos de Mercenarios (G-Mounted -> G-Montada)
+        let final = nombreOriginal;
+        if(final.includes("Tier")) final = final.replace("Tier", u["Tier"]);
         if(final.startsWith("G-")) final = u["G-"] + (u[final.substring(2)] || final.substring(2));
         else if(final.startsWith("S-")) final = u["S-"] + (u[final.substring(2)] || final.substring(2));
-        
-        // Traducir tipos base y monstruos
         else if(final.includes("Monster: ")) {
             const tipo = final.split(": ")[1];
             final = u["Monsters"] + ": " + (u[tipo] || tipo);
         }
-        else final = u[nombreOriginal] || nombreOriginal;
-
         return final;
     }
 
@@ -209,10 +193,12 @@ HTML
         document.querySelectorAll('.lvl-lider').forEach(input => total += (parseInt(input.value) || 1) * 3000);
         document.querySelectorAll('#lista-tropas .fila-dinamica').forEach(f => total += (parseInt(f.querySelector('.qty').value) || 0) * (parseInt(f.querySelector('.sub-t').value) || 0));
         document.querySelectorAll('.qty-recurso').forEach(f => total += (parseInt(f.value) || 0) * (parseInt(f.parentElement.querySelector('select').value) || 0));
+        
         if(document.getElementById('check-portal').checked) total += 5000000;
         total += (parseInt(document.getElementById('wall-lvl').value) || 0) * 1000000;
         total += (parseInt(document.getElementById('fort-lvl').value) || 0) * 50000000;
         total += (parseInt(document.getElementById('cap-lvl').value) || 0) * 450000000;
+        
         const isG = document.getElementById('m-o').checked;
         document.getElementById('total-final').innerText = Math.round(isG ? total/3000 : total).toLocaleString();
         document.getElementById('txt-moneda').innerText = isG ? i18n[idm].monedaOro : i18n[idm].monedaPlata;
