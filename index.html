@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FobS Compensation Calculator - Official V5</title>
+    <title>FobS Compensation Calculator - Custom Order</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -23,11 +23,12 @@
         .check-oculto:checked + .boton-check::after { content: '✔'; color: white; position: absolute; left: 4px; top: -2px; font-size: 18px; }
         
         .nivel-lider { display: none; width: 80px; text-align: center; }
-        .fila-tropa { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; }
+        .fila-tropa { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
-        .btn-calc { background: #8b5a2b; color: white; border: none; padding: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.2em; text-transform: uppercase; margin-top: 15px; }
+        .btn-calc { background: #8b5a2b; color: white; border: none; padding: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.2em; text-transform: uppercase; margin-top: 15px; transition: 0.3s; }
+        .btn-calc:hover { background: #a67341; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
         small.limit-info { color: #8b5a2b; font-size: 0.75em; display: block; margin-top: 2px; }
     </style>
@@ -37,7 +38,35 @@
 <div class="contenedor">
     <h2>### Attack Compensation Calculator ###</h2>
 
-    <h3>1. Stolen Resources</h3>
+    <h3>1. Leaders Status (Section 3)</h3>
+    <div id="seccion-lideres">
+        <div class="fila-check">
+            <input type="checkbox" id="c-h" class="check-oculto" onclick="document.getElementById('n-h').style.display = this.checked ? 'block' : 'none'">
+            <label for="c-h" class="boton-check"></label><label style="flex-grow:1; cursor:pointer;">Hero (3k silver/lvl)</label>
+            <input type="number" id="n-h" class="nivel-lider" placeholder="Lvl">
+        </div>
+        <div class="fila-check">
+            <input type="checkbox" id="c-c1" class="check-oculto" onclick="document.getElementById('n-c1').style.display = this.checked ? 'block' : 'none'">
+            <label for="c-c1" class="boton-check"></label><label style="flex-grow:1; cursor:pointer;">Captain 1</label>
+            <input type="number" id="n-c1" class="nivel-lider" placeholder="Lvl">
+        </div>
+        <div class="fila-check">
+            <input type="checkbox" id="c-c2" class="check-oculto" onclick="document.getElementById('n-c2').style.display = this.checked ? 'block' : 'none'">
+            <label for="c-c2" class="boton-check"></label><label style="flex-grow:1; cursor:pointer;">Captain 2</label>
+            <input type="number" id="n-c2" class="nivel-lider" placeholder="Lvl">
+        </div>
+        <div class="fila-check">
+            <input type="checkbox" id="c-c3" class="check-oculto" onclick="document.getElementById('n-c3').style.display = this.checked ? 'block' : 'none'">
+            <label for="c-c3" class="boton-check"></label><label style="flex-grow:1; cursor:pointer;">Captain 3</label>
+            <input type="number" id="n-c3" class="nivel-lider" placeholder="Lvl">
+        </div>
+    </div>
+
+    <h3>2. Unit Losses (Section 4)</h3>
+    <div id="lista-tropas"></div>
+    <button class="btn-add" onclick="nuevaFila()">+ Add Unit Type</button>
+
+    <h3>3. Stolen Resources (Section 1)</h3>
     <div class="grid-triple">
         <div class="caja-input">
             <label>Silver Stolen</label>
@@ -53,7 +82,7 @@
         </div>
     </div>
 
-    <h3>2. Clan Buildings & Portal</h3>
+    <h3>4. Clan Buildings & Portal (Section 2)</h3>
     <div class="fila-check">
         <input type="checkbox" id="check-portal" class="check-oculto">
         <label for="check-portal" class="boton-check"></label>
@@ -78,38 +107,10 @@
         </div>
     </div>
 
-    <h3>3. Leaders Status</h3>
-    <div id="seccion-lideres">
-        <div class="fila-check">
-            <input type="checkbox" id="c-h" class="check-oculto" onclick="document.getElementById('n-h').style.display = this.checked ? 'block' : 'none'">
-            <label for="c-h" class="boton-check"></label><label style="flex-grow:1;">Hero (3k/lvl)</label>
-            <input type="number" id="n-h" class="nivel-lider" placeholder="Lvl">
-        </div>
-        <div class="fila-check">
-            <input type="checkbox" id="c-c1" class="check-oculto" onclick="document.getElementById('n-c1').style.display = this.checked ? 'block' : 'none'">
-            <label for="c-c1" class="boton-check"></label><label style="flex-grow:1;">Captain 1</label>
-            <input type="number" id="n-c1" class="nivel-lider" placeholder="Lvl">
-        </div>
-        <div class="fila-check">
-            <input type="checkbox" id="c-c2" class="check-oculto" onclick="document.getElementById('n-c2').style.display = this.checked ? 'block' : 'none'">
-            <label for="c-c2" class="boton-check"></label><label style="flex-grow:1;">Captain 2</label>
-            <input type="number" id="n-c2" class="nivel-lider" placeholder="Lvl">
-        </div>
-        <div class="fila-check">
-            <input type="checkbox" id="c-c3" class="check-oculto" onclick="document.getElementById('n-c3').style.display = this.checked ? 'block' : 'none'">
-            <label for="c-c3" class="boton-check"></label><label style="flex-grow:1;">Captain 3</label>
-            <input type="number" id="n-c3" class="nivel-lider" placeholder="Lvl">
-        </div>
-    </div>
-
-    <h3>4. Unit Losses</h3>
-    <div id="lista-tropas"></div>
-    <button class="btn-add" onclick="nuevaFila()">+ Add Unit Type</button>
-
     <div class="total-box">
         <p>Display as: 
-            <input type="radio" name="m" value="p" id="m-p"> <label for="m-p">Silver</label>
-            <input type="radio" name="m" value="o" id="m-o" checked> <label for="m-o">Gold</label>
+            <input type="radio" name="m" value="p" id="m-p"> <label for="m-p" style="cursor:pointer">Silver</label>
+            <input type="radio" name="m" value="o" id="m-o" checked style="margin-left:15px;"> <label for="m-o" style="cursor:pointer">Gold</label>
         </p>
         <button class="btn-calc" onclick="calcular()">Calculate Compensation</button>
         <span id="total-final">0</span>
@@ -161,27 +162,27 @@
     function calcular() {
         let silver = 0;
         
-        // 1. Robo
-        silver += (parseInt(document.getElementById('rob-silver').value) || 0);
-        silver += (parseInt(document.getElementById('rob-gold').value) || 0) * 3000;
-        silver += (parseInt(document.getElementById('rob-tar').value) || 0) * 4500;
-        
-        // 2. Portal y Edificios (Con Validaciones de rango)
-        if(document.getElementById('check-portal').checked) silver += 5000000;
-        silver += validar('wall-lvl', 45) * 1000000;
-        silver += validar('fort-lvl', 25) * 50000000;
-        silver += validar('cap-lvl', 25) * 450000000;
-
-        // 3. Lideres
+        // Lideres (Sec 3)
         ['n-h','n-c1','n-c2','n-c3'].forEach(id => {
             let el = document.getElementById(id);
             if(el && el.style.display === 'block') silver += (parseInt(el.value) || 0) * 3000;
         });
 
-        // 4. Tropas
+        // Tropas (Sec 4)
         document.querySelectorAll('.fila-tropa').forEach(f => {
             silver += (parseInt(f.querySelector('.qty').value) || 0) * (parseInt(f.querySelector('.sub-t').value) || 0);
         });
+
+        // Robo (Sec 1)
+        silver += (parseInt(document.getElementById('rob-silver').value) || 0);
+        silver += (parseInt(document.getElementById('rob-gold').value) || 0) * 3000;
+        silver += (parseInt(document.getElementById('rob-tar').value) || 0) * 4500;
+        
+        // Clan (Sec 2)
+        if(document.getElementById('check-portal').checked) silver += 5000000;
+        silver += validar('wall-lvl', 45) * 1000000;
+        silver += validar('fort-lvl', 25) * 50000000;
+        silver += validar('cap-lvl', 25) * 450000000;
 
         const isGold = document.getElementById('m-o').checked;
         document.getElementById('total-final').innerText = Math.round(isGold ? silver/3000 : silver).toLocaleString();
