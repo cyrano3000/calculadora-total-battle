@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FobS Global Calculator</title>
+    <title>FobS Global Calculator - V9</title>
     <style>
-        body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; transition: direction 0.3s; }
         .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
         .lang-selector { text-align: right; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; }
+        [dir="rtl"] .lang-selector { text-align: left; }
+        
         h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
-        
+        [dir="rtl"] h3 { border-left: none; border-right: 5px solid #8b5a2b; padding-left: 0; padding-right: 15px; }
+
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; margin-bottom: 15px; transition: 0.3s; }
         .btn-add:hover { background: #5da356; }
@@ -35,11 +38,13 @@
 </head>
 <body>
 
-<div class="contenedor">
+<div class="contenedor" id="main-container">
     <div class="lang-selector">
         <select id="select-idioma" onchange="cambiarIdioma()">
             <option value="en">English 🇬🇧</option>
             <option value="es" selected>Español 🇪🇸</option>
+            <option value="it">Italiano 🇮🇹</option>
+            <option value="ar">العربية 🇸🇦</option>
             <option value="pt">Português 🇧🇷</option>
             <option value="fr">Français 🇫🇷</option>
             <option value="de">Deutsch 🇩🇪</option>
@@ -96,13 +101,15 @@
 
 <script>
     const i18n = {
-        es: { titulo: "Calculadora de Compensación", secLideres: "1. Líderes Capturados", secTropas: "2. Pérdidas de Tropas", secRecursos: "3. Recursos Robados", secClan: "4. Edificios de Clan", btnAddLider: "+ Añadir Líder", btnAddTropa: "+ Añadir Tropa", btnAddRecurso: "+ Añadir Recurso", lblPortal: "Portal Destruido (+5M Plata)", lblWall: "Muros Ciudad", lblFort: "Fortaleza", lblCap: "Capital", mostrarComo: "Mostrar como:", btnCalc: "Calcular Compensación", monedaOro: "monedas de oro", monedaPlata: "plata", cat: "Categoría", cant: "Cant", her: "Héroe", cap: "Capitán", oro: "Oro", ace: "Aceite", pla: "Plata", pie: "Piedra", mad: "Madera", hie: "Hierro" },
-        en: { titulo: "Compensation Calculator", secLideres: "1. Captured Leaders", secTropas: "2. Unit Losses", secRecursos: "3. Stolen Resources", secClan: "4. Clan Buildings", btnAddLider: "+ Add Leader", btnAddTropa: "+ Add Unit", btnAddRecurso: "+ Add Resource", lblPortal: "Portal Destroyed (+5M Silver)", lblWall: "City Walls", lblFort: "Fortress", lblCap: "Capital", mostrarComo: "Display as:", btnCalc: "Calculate Compensation", monedaOro: "gold coins", monedaPlata: "silver", cat: "Category", cant: "Qty", her: "Hero", cap: "Captain", oro: "Gold", ace: "TAR (Oil)", pla: "Silver", pie: "Stone", mad: "Wood", hie: "Iron" },
-        pt: { titulo: "Calculadora de Compensação", secLideres: "1. Líderes Capturados", secTropas: "2. Perdas de Tropas", secRecursos: "3. Recursos Roubados", secClan: "4. Edifícios de Clã", btnAddLider: "+ Adicionar Líder", btnAddTropa: "+ Adicionar Tropa", btnAddRecurso: "+ Adicionar Recurso", lblPortal: "Portal Destruído (+5M Prata)", lblWall: "Muralhas da Cidade", lblFort: "Fortaleza", lblCap: "Capital", mostrarComo: "Mostrar como:", btnCalc: "Calcular Compensação", monedaOro: "moedas de ouro", monedaPlata: "prata", cat: "Categoria", cant: "Qtd", her: "Herói", cap: "Capitão", oro: "Ouro", ace: "Óleo (TAR)", pla: "Prata", pie: "Pedra", mad: "Madeira", hie: "Ferro" },
-        fr: { titulo: "Calculateur de Compensation", secLideres: "1. Chefs Capturés", secTropas: "2. Pertes d'Unités", secRecursos: "3. Ressources Volées", secClan: "4. Bâtiments de Clan", btnAddLider: "+ Ajouter Chef", btnAddTropa: "+ Ajouter Unité", btnAddRecurso: "+ Ajouter Ressource", lblPortal: "Portail Détruit (+5M Argent)", lblWall: "Murs de la Ville", lblFort: "Forteresse", lblCap: "Capitale", mostrarComo: "Afficher en:", btnCalc: "Calculer la Compensation", monedaOro: "pièces d'or", monedaPlata: "argent", cat: "Catégorie", cant: "Qté", her: "Héros", cap: "Capitaine", oro: "Or", ace: "Huile (TAR)", pla: "Argent", pie: "Pierre", mad: "Bois", hie: "Fer" },
-        de: { titulo: "Entschädigungsrechner", secLideres: "1. Gefangene Anführer", secTropas: "2. Truppenverluste", secRecursos: "3. Gestohlene Ressourcen", secClan: "4. Clan-Gebäude", btnAddLider: "+ Anführer hinzufügen", btnAddTropa: "+ Einheit hinzufügen", btnAddRecurso: "+ Ressource hinzufügen", lblPortal: "Portal zerstört (+5M Silber)", lblWall: "Stadtmauern", lblFort: "Festung", lblCap: "Hauptstadt", mostrarComo: "Anzeigen als:", btnCalc: "Berechnen", monedaOro: "Goldmünzen", monedaPlata: "Silber", cat: "Kategorie", cant: "Menge", her: "Held", cap: "Hauptmann", oro: "Gold", ace: "Öl (TAR)", pla: "Silber", pie: "Stein", mad: "Holz", hie: "Eisen" },
-        ru: { titulo: "Калькулятор компенсации", secLideres: "1. Пленные лидеры", secTropas: "2. Потери войск", secRecursos: "3. Украденные ресурсы", secClan: "4. Здания клана", btnAddLider: "+ Добавить лидера", btnAddTropa: "+ Добавить войска", btnAddRecurso: "+ Добавить ресурс", lblPortal: "Портал разрушен (+5M серебра)", lblWall: "Стены города", lblFort: "Крепость", lblCap: "Столица", mostrarComo: "Показать как:", btnCalc: "Рассчитать", monedaOro: "золотых монет", monedaPlata: "серебра", cat: "Категория", cant: "Кол-во", her: "Герой", cap: "Капитан", oro: "Золото", ace: "Нефть (TAR)", pla: "Серебро", pie: "Камень", mad: "Дерево", hie: "Железо" },
-        tr: { titulo: "Tazminat Hesaplayıcı", secLideres: "1. Esir Liderler", secTropas: "2. Asker Kayıpları", secRecursos: "3. Çalınan Kaynaklar", secClan: "4. Klan Binaları", btnAddLider: "+ Lider Ekle", btnAddTropa: "+ Asker Ekle", btnAddRecurso: "+ Kaynak Ekle", lblPortal: "Portal Yok Edildi (+5M Gümüş)", lblWall: "Şehir Surları", lblFort: "Kale", lblCap: "Başkent", mostrarComo: "Birimi:", btnCalc: "Hesapla", monedaOro: "altın para", monedaPlata: "gümüş", cat: "Kategori", cant: "Adet", her: "Kahraman", cap: "Kaptan", oro: "Altın", ace: "Petrol (TAR)", pla: "Gümüş", pie: "Taş", mad: "Odun", hie: "Demir" }
+        es: { titulo: "Calculadora de Compensación", secLideres: "1. Líderes Capturados", secTropas: "2. Pérdidas de Tropas", secRecursos: "3. Recursos Robados", secClan: "4. Edificios de Clan", btnAddLider: "+ Añadir Líder", btnAddTropa: "+ Añadir Tropa", btnAddRecurso: "+ Añadir Recurso", lblPortal: "Portal Destruido (+5M Plata)", lblWall: "Muros Ciudad", lblFort: "Fortaleza", lblCap: "Capital", mostrarComo: "Mostrar como:", btnCalc: "Calcular Compensación", monedaOro: "monedas de oro", monedaPlata: "plata", cat: "Categoría", cant: "Cant", her: "Héroe", cap: "Capitán", oro: "Oro", ace: "Aceite", pla: "Plata", pie: "Piedra", mad: "Madera", hie: "Hierro", rtl: false },
+        en: { titulo: "Compensation Calculator", secLideres: "1. Captured Leaders", secTropas: "2. Unit Losses", secRecursos: "3. Stolen Resources", secClan: "4. Clan Buildings", btnAddLider: "+ Add Leader", btnAddTropa: "+ Add Unit", btnAddRecurso: "+ Add Resource", lblPortal: "Portal Destroyed (+5M Silver)", lblWall: "City Walls", lblFort: "Fortress", lblCap: "Capital", mostrarComo: "Display as:", btnCalc: "Calculate Compensation", monedaOro: "gold coins", monedaPlata: "silver", cat: "Category", cant: "Qty", her: "Hero", cap: "Captain", oro: "Gold", ace: "TAR (Oil)", pla: "Silver", pie: "Stone", mad: "Wood", hie: "Iron", rtl: false },
+        it: { titulo: "Calcolatore di Compensazione", secLideres: "1. Leader Catturati", secTropas: "2. Perdite di Truppe", secRecursos: "3. Risorse Rubate", secClan: "4. Edifici del Clan", btnAddLider: "+ Aggiungi Leader", btnAddTropa: "+ Aggiungi Truppa", btnAddRecurso: "+ Aggiungi Risorsa", lblPortal: "Portale Distrutto (+5M Argento)", lblWall: "Mura della Città", lblFort: "Fortezza", lblCap: "Capitale", mostrarComo: "Mostra come:", btnCalc: "Calcola Compensazione", monedaOro: "monete d'oro", monedaPlata: "argento", cat: "Categoria", cant: "Qta", her: "Eroe", cap: "Capitano", oro: "Oro", ace: "Olio (TAR)", pla: "Argento", pie: "Pietra", mad: "Legno", hie: "Ferro", rtl: false },
+        ar: { titulo: "حاسبة التعويضات", secLideres: "1. القادة المأسورون", secTropas: "2. خسائر الوحدات", secRecursos: "3. الموارد المسروقة", secClan: "4. مباني القبيلة", btnAddLider: "+ إضافة قائد", btnAddTropa: "+ إضافة وحدة", btnAddRecurso: "+ إضافة مورد", lblPortal: "بوابة مدمرة (+5M فضة)", lblWall: "أسوار المدينة", lblFort: "الحصن", lblCap: "العاصمة", mostrarComo: "عرض كـ:", btnCalc: "احسب التعويض", monedaOro: "عملات ذهبية", monedaPlata: "فضة", cat: "الفئة", cant: "الكمية", her: "بطل", cap: "قائد", oro: "ذهب", ace: "نفط (TAR)", pla: "فضة", pie: "حجر", mad: "خشب", hie: "حديد", rtl: true },
+        pt: { titulo: "Calculadora de Compensação", secLideres: "1. Líderes Capturados", secTropas: "2. Perdas de Tropas", secRecursos: "3. Recursos Roubados", secClan: "4. Edifícios de Clã", btnAddLider: "+ Adicionar Líder", btnAddTropa: "+ Adicionar Tropa", btnAddRecurso: "+ Adicionar Recurso", lblPortal: "Portal Destruído (+5M Prata)", lblWall: "Muralhas da Cidade", lblFort: "Fortaleza", lblCap: "Capital", mostrarComo: "Mostrar como:", btnCalc: "Calcular Compensação", monedaOro: "moedas de ouro", monedaPlata: "prata", cat: "Categoria", cant: "Qtd", her: "Herói", cap: "Capitão", oro: "Ouro", ace: "Óleo (TAR)", pla: "Prata", pie: "Pedra", mad: "Madeira", hie: "Ferro", rtl: false },
+        fr: { titulo: "Calculateur de Compensation", secLideres: "1. Chefs Capturés", secTropas: "2. Pertes d'Unités", secRecursos: "3. Ressources Volées", secClan: "4. Bâtiments de Clan", btnAddLider: "+ Ajouter Chef", btnAddTropa: "+ Ajouter Unité", btnAddRecurso: "+ Ajouter Ressource", lblPortal: "Portail Détruit (+5M Argent)", lblWall: "Murs de la Ville", lblFort: "Forteresse", lblCap: "Capitale", mostrarComo: "Afficher en:", btnCalc: "Calculer la Compensation", monedaOro: "pièces d'or", monedaPlata: "argent", cat: "Catégorie", cant: "Qté", her: "Héros", cap: "Capitaine", oro: "Or", ace: "Huile (TAR)", pla: "Argent", pie: "Pierre", mad: "Bois", hie: "Fer", rtl: false },
+        de: { titulo: "Entschädigungsrechner", secLideres: "1. Gefangene Anführer", secTropas: "2. Truppenverluste", secRecursos: "3. Gestohlene Ressourcen", secClan: "4. Clan-Gebäude", btnAddLider: "+ Anführer hinzufügen", btnAddTropa: "+ Einheit hinzufügen", btnAddRecurso: "+ Ressource hinzufügen", lblPortal: "Portal zerstört (+5M Silber)", lblWall: "Stadtmauern", lblFort: "Festung", lblCap: "Hauptstadt", mostrarComo: "Anzeigen als:", btnCalc: "Berechnen", monedaOro: "Goldmünzen", monedaPlata: "Silber", cat: "Kategorie", cant: "Menge", her: "Held", cap: "Hauptmann", oro: "Gold", ace: "Öl (TAR)", pla: "Silber", pie: "Stein", mad: "Holz", hie: "Eisen", rtl: false },
+        ru: { titulo: "Калькулятор компенсации", secLideres: "1. Пленные лидеры", secTropas: "2. Потери войск", secRecursos: "3. Украденные ресурсы", secClan: "4. Здания клана", btnAddLider: "+ Добавить лидера", btnAddTropa: "+ Добавить войска", btnAddRecurso: "+ Добавить ресурс", lblPortal: "Портал разрушен (+5M серебра)", lblWall: "Стены города", lblFort: "Крепость", lblCap: "Столица", mostrarComo: "Показать как:", btnCalc: "Рассчитать", monedaOro: "золотых монет", monedaPlata: "серебра", cat: "Категория", cant: "Кол-во", her: "Герой", cap: "Капитан", oro: "Золото", ace: "Нефть (TAR)", pla: "Серебро", pie: "Камень", mad: "Дерево", hie: "Железо", rtl: false },
+        tr: { titulo: "Tazminat Hesaplayıcı", secLideres: "1. Esir Liderler", secTropas: "2. Asker Kayıpları", secRecursos: "3. Çalınan Kaynaklar", secClan: "4. Klan Binaları", btnAddLider: "+ Lider Ekle", btnAddTropa: "+ Asker Ekle", btnAddRecurso: "+ Kaynak Ekle", lblPortal: "Portal Yok Edildi (+5M Gümüş)", lblWall: "Şehir Surları", lblFort: "Kale", lblCap: "Başkent", mostrarComo: "Birimi:", btnCalc: "Hesapla", monedaOro: "altın para", monedaPlata: "gümüş", cat: "Kategori", cant: "Adet", her: "Kahraman", cap: "Kaptan", oro: "Altın", ace: "Petrol (TAR)", pla: "Gümüş", pie: "Taş", mad: "Odun", hie: "Demir", rtl: false }
     };
 
     let idm = 'es';
@@ -110,6 +117,11 @@
     function cambiarIdioma() {
         idm = document.getElementById('select-idioma').value;
         const t = i18n[idm];
+        
+        // Manejo de Dirección (RTL para Árabe)
+        document.getElementById('main-container').dir = t.rtl ? 'rtl' : 'ltr';
+        document.body.dir = t.rtl ? 'rtl' : 'ltr';
+
         document.getElementById('txt-titulo').innerText = t.titulo;
         document.getElementById('txt-sec-lideres').innerText = t.secLideres;
         document.getElementById('txt-sec-tropas').innerText = t.secTropas;
@@ -126,6 +138,11 @@
         document.getElementById('btn-calc').innerText = t.btnCalc;
         document.getElementById('lbl-silver').innerText = t.pla;
         document.getElementById('lbl-gold').innerText = t.oro;
+        
+        // Limpiar para refrescar etiquetas dinámicas
+        document.getElementById('lista-lideres').innerHTML = '';
+        document.getElementById('lista-tropas').innerHTML = '';
+        document.getElementById('lista-recursos').innerHTML = '';
         calcular();
     }
 
