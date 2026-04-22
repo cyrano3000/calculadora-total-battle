@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FobS Compensation Calculator - Custom Order</title>
+    <title>FobS Compensation Calculator - Official V7</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -16,20 +16,20 @@
         
         input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
         
+        .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
+        .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; margin-bottom: 15px; transition: 0.3s; }
+        .btn-add:hover { background: #5da356; }
+        
         .fila-check { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #3d2b1f; margin-bottom: 8px; }
         .check-oculto { display: none; }
         .boton-check { width: 24px; height: 24px; border: 2px solid #d4af37; border-radius: 4px; cursor: pointer; background: #1a110a; position: relative; flex-shrink: 0; }
         .check-oculto:checked + .boton-check { background: #4a7c44; border-color: #76b06d; }
         .check-oculto:checked + .boton-check::after { content: '✔'; color: white; position: absolute; left: 4px; top: -2px; font-size: 18px; }
         
-        .nivel-lider { display: none; width: 80px; text-align: center; }
-        .fila-tropa { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
-        
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
         .btn-calc { background: #8b5a2b; color: white; border: none; padding: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.2em; text-transform: uppercase; margin-top: 15px; transition: 0.3s; }
         .btn-calc:hover { background: #a67341; }
-        .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
         small.limit-info { color: #8b5a2b; font-size: 0.75em; display: block; margin-top: 2px; }
     </style>
 </head>
@@ -38,51 +38,19 @@
 <div class="contenedor">
     <h2>### Attack Compensation Calculator ###</h2>
 
-    <h3>1. Leaders Status (Section 3)</h3>
-    <div id="seccion-lideres">
-        <div class="fila-check">
-            <input type="checkbox" id="c-h" class="check-oculto" onclick="document.getElementById('n-h').style.display = this.checked ? 'block' : 'none'">
-            <label for="c-h" class="boton-check"></label><label style="flex-grow:1; cursor:pointer;">Hero (3k silver/lvl)</label>
-            <input type="number" id="n-h" class="nivel-lider" placeholder="Lvl">
-        </div>
-        <div class="fila-check">
-            <input type="checkbox" id="c-c1" class="check-oculto" onclick="document.getElementById('n-c1').style.display = this.checked ? 'block' : 'none'">
-            <label for="c-c1" class="boton-check"></label><label style="flex-grow:1; cursor:pointer;">Captain 1</label>
-            <input type="number" id="n-c1" class="nivel-lider" placeholder="Lvl">
-        </div>
-        <div class="fila-check">
-            <input type="checkbox" id="c-c2" class="check-oculto" onclick="document.getElementById('n-c2').style.display = this.checked ? 'block' : 'none'">
-            <label for="c-c2" class="boton-check"></label><label style="flex-grow:1; cursor:pointer;">Captain 2</label>
-            <input type="number" id="n-c2" class="nivel-lider" placeholder="Lvl">
-        </div>
-        <div class="fila-check">
-            <input type="checkbox" id="c-c3" class="check-oculto" onclick="document.getElementById('n-c3').style.display = this.checked ? 'block' : 'none'">
-            <label for="c-c3" class="boton-check"></label><label style="flex-grow:1; cursor:pointer;">Captain 3</label>
-            <input type="number" id="n-c3" class="nivel-lider" placeholder="Lvl">
-        </div>
-    </div>
+    <h3>1. Captured Leaders</h3>
+    <div id="lista-lideres"></div>
+    <button class="btn-add" onclick="nuevoLider()">+ Add Captured Leader</button>
 
-    <h3>2. Unit Losses (Section 4)</h3>
+    <h3>2. Unit Losses</h3>
     <div id="lista-tropas"></div>
-    <button class="btn-add" onclick="nuevaFila()">+ Add Unit Type</button>
+    <button class="btn-add" onclick="nuevaFilaTropa()">+ Add Unit Type</button>
 
-    <h3>3. Stolen Resources (Section 1)</h3>
-    <div class="grid-triple">
-        <div class="caja-input">
-            <label>Silver Stolen</label>
-            <input type="number" id="rob-silver" placeholder="0">
-        </div>
-        <div class="caja-input">
-            <label>Gold Stolen</label>
-            <input type="number" id="rob-gold" placeholder="0">
-        </div>
-        <div class="caja-input">
-            <label>TAR (Oil) Stolen</label>
-            <input type="number" id="rob-tar" placeholder="0">
-        </div>
-    </div>
+    <h3>3. Stolen Resources</h3>
+    <div id="lista-recursos"></div>
+    <button class="btn-add" onclick="nuevoRecurso()">+ Add Stolen Resource</button>
 
-    <h3>4. Clan Buildings & Portal (Section 2)</h3>
+    <h3>4. Clan Buildings & Portal</h3>
     <div class="fila-check">
         <input type="checkbox" id="check-portal" class="check-oculto">
         <label for="check-portal" class="boton-check"></label>
@@ -92,18 +60,18 @@
     <div class="grid-triple">
         <div class="caja-input">
             <label>City Walls Lvl</label>
-            <input type="number" id="wall-lvl" placeholder="1-45" min="0" max="45">
-            <small class="limit-info">Limit: 45</small>
+            <input type="number" id="wall-lvl" placeholder="1-45" min="1" max="45" onchange="validarRango(this, 1, 45)">
+            <small class="limit-info">Range: 1-45</small>
         </div>
         <div class="caja-input" style="border: 1px solid #d4af37;">
             <label>Fortress Lvl</label>
-            <input type="number" id="fort-lvl" placeholder="1-25" min="0" max="25">
-            <small class="limit-info">Limit: 25</small>
+            <input type="number" id="fort-lvl" placeholder="1-25" min="1" max="25" onchange="validarRango(this, 1, 25)">
+            <small class="limit-info">Range: 1-25</small>
         </div>
         <div class="caja-input" style="border: 1px solid #d4af37;">
             <label>Capital Lvl</label>
-            <input type="number" id="cap-lvl" placeholder="1-25" min="0" max="25">
-            <small class="limit-info">Limit: 25</small>
+            <input type="number" id="cap-lvl" placeholder="1-25" min="1" max="25" onchange="validarRango(this, 1, 25)">
+            <small class="limit-info">Range: 1-25</small>
         </div>
     </div>
 
@@ -119,7 +87,7 @@
 </div>
 
 <script>
-    const DB = {
+    const DB_TROPAS = {
         "Guards": { "Mounted": 1265, "Flying": 12640, "Melee/Ranged": 630 },
         "Specialists": { "Mounted": 1390, "Flying/Melee/Ranged": 695, "Scouts": 6320 },
         "Siege": { "Default Units": 3475 },
@@ -131,61 +99,101 @@
         }
     };
 
-    function nuevaFila() {
+    // Valores basados en imágenes de recursos
+    const VALORES_RECURSOS = {
+        "Oro": 3000,
+        "Aceite": 4500,
+        "Plata": 1,
+        "Piedra": 0,
+        "Madera": 0,
+        "Hierro": 0
+    };
+
+    function validarRango(input, min, max) {
+        let val = parseInt(input.value);
+        if (isNaN(val)) return;
+        if (val < min) input.value = min;
+        if (val > max) input.value = max;
+    }
+
+    function nuevoLider() {
         const div = document.createElement('div');
-        div.className = 'fila-tropa';
-        let opt = Object.keys(DB).map(c => `<option value="${c}">${c}</option>`).join('');
-        div.innerHTML = `<select onchange="updateSub(this)"><option value="">Category</option>${opt}</select>
+        div.className = 'fila-dinamica';
+        div.innerHTML = `
+            <select class="tipo-lider">
+                <option value="3000">Hero</option>
+                <option value="3000">Captain 1</option>
+                <option value="3000">Captain 2</option>
+                <option value="3000">Captain 3</option>
+            </select>
+            <input type="number" class="lvl-lider" placeholder="Level" min="1" value="1" onchange="if(this.value<1)this.value=1">
+            <button onclick="this.parentElement.remove()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">✖</button>
+        `;
+        document.getElementById('lista-lideres').appendChild(div);
+    }
+
+    function nuevaFilaTropa() {
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        let opt = Object.keys(DB_TROPAS).map(c => `<option value="${c}">${c}</option>`).join('');
+        div.innerHTML = `<select onchange="updateSubTropa(this)"><option value="">Category</option>${opt}</select>
             <select class="sub-t" style="display:none"></select>
-            <input type="number" class="qty" placeholder="Qty">
+            <input type="number" class="qty" placeholder="Qty" min="1" onchange="if(this.value<1)this.value=1">
             <button onclick="this.parentElement.remove()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">✖</button>`;
         document.getElementById('lista-tropas').appendChild(div);
     }
 
-    function updateSub(sel) {
+    function updateSubTropa(sel) {
         const sub = sel.parentElement.querySelector('.sub-t');
         if(sel.value) {
-            sub.innerHTML = Object.entries(DB[sel.value]).map(([n,v])=>`<option value="${v}">${n} (${v})</option>`).join('');
+            sub.innerHTML = Object.entries(DB_TROPAS[sel.value]).map(([n,v])=>`<option value="${v}">${n} (${v})</option>`).join('');
             sub.style.display = "block";
         }
     }
 
-    function validar(id, max) {
-        let val = parseInt(document.getElementById(id).value) || 0;
-        if (val > max) {
-            document.getElementById(id).value = max;
-            return max;
-        }
-        return val;
+    function nuevoRecurso() {
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        let opt = Object.keys(VALORES_RECURSOS).map(r => `<option value="${VALORES_RECURSOS[r]}">${r}</option>`).join('');
+        div.innerHTML = `
+            <select class="tipo-recurso">${opt}</select>
+            <input type="number" class="qty-recurso" placeholder="Amount" min="1" value="1" onchange="if(this.value<1)this.value=1">
+            <button onclick="this.parentElement.remove()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">✖</button>
+        `;
+        document.getElementById('lista-recursos').appendChild(div);
     }
 
     function calcular() {
-        let silver = 0;
+        let plataTotal = 0;
         
-        // Lideres (Sec 3)
-        ['n-h','n-c1','n-c2','n-c3'].forEach(id => {
-            let el = document.getElementById(id);
-            if(el && el.style.display === 'block') silver += (parseInt(el.value) || 0) * 3000;
+        // 1. Líderes
+        document.querySelectorAll('#lista-lideres .fila-dinamica').forEach(f => {
+            plataTotal += (parseInt(f.querySelector('.lvl-lider').value) || 1) * 3000;
         });
 
-        // Tropas (Sec 4)
-        document.querySelectorAll('.fila-tropa').forEach(f => {
-            silver += (parseInt(f.querySelector('.qty').value) || 0) * (parseInt(f.querySelector('.sub-t').value) || 0);
+        // 2. Tropas
+        document.querySelectorAll('#lista-tropas .fila-dinamica').forEach(f => {
+            let qty = parseInt(f.querySelector('.qty').value) || 0;
+            let val = parseInt(f.querySelector('.sub-t').value) || 0;
+            plataTotal += (qty * val);
         });
 
-        // Robo (Sec 1)
-        silver += (parseInt(document.getElementById('rob-silver').value) || 0);
-        silver += (parseInt(document.getElementById('rob-gold').value) || 0) * 3000;
-        silver += (parseInt(document.getElementById('rob-tar').value) || 0) * 4500;
+        // 3. Recursos (Dinámicos)
+        document.querySelectorAll('#lista-recursos .fila-dinamica').forEach(f => {
+            let qty = parseInt(f.querySelector('.qty-recurso').value) || 0;
+            let factor = parseInt(f.querySelector('.tipo-recurso').value) || 0;
+            plataTotal += (qty * factor);
+        });
         
-        // Clan (Sec 2)
-        if(document.getElementById('check-portal').checked) silver += 5000000;
-        silver += validar('wall-lvl', 45) * 1000000;
-        silver += validar('fort-lvl', 25) * 50000000;
-        silver += validar('cap-lvl', 25) * 450000000;
+        // 4. Edificios de Clan
+        if(document.getElementById('check-portal').checked) plataTotal += 5000000;
+        
+        plataTotal += (parseInt(document.getElementById('wall-lvl').value) || 0) * 1000000;
+        plataTotal += (parseInt(document.getElementById('fort-lvl').value) || 0) * 50000000;
+        plataTotal += (parseInt(document.getElementById('cap-lvl').value) || 0) * 450000000;
 
         const isGold = document.getElementById('m-o').checked;
-        document.getElementById('total-final').innerText = Math.round(isGold ? silver/3000 : silver).toLocaleString();
+        document.getElementById('total-final').innerText = Math.round(isGold ? plataTotal/3000 : plataTotal).toLocaleString();
         document.getElementById('txt-moneda').innerText = isGold ? "gold coins" : "silver";
     }
 </script>
