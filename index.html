@@ -140,4 +140,82 @@
         document.getElementById('lbl-wall').innerText = t.lblWall;
         document.getElementById('lbl-fort').innerText = t.lblFort;
         document.getElementById('lbl-cap').innerText = t.lblCap;
-        document.getElementById('txt-mostrar-como').innerText = t.mostrarComo
+        document.getElementById('txt-mostrar-como').innerText = t.mostrarComo;
+        document.getElementById('btn-calc').innerText = t.btnCalc;
+        document.getElementById('lbl-silver').innerText = t.pla;
+        document.getElementById('lbl-gold').innerText = t.oro;
+        document.getElementById('lista-lideres').innerHTML = '';
+        document.getElementById('lista-tropas').innerHTML = '';
+        document.getElementById('lista-recursos').innerHTML = '';
+        calcular();
+    }
+
+    const DB_T = {
+        "Guards": { "Mounted": 1265, "Flying": 12640, "Melee/Ranged": 630 },
+        "Specialists": { "Mounted": 1390, "Flying/Melee/Ranged": 695, "Scouts": 6320 },
+        "Siege": { "Default Units": 3475 },
+        "Monsters": { "Tier III": 4000, "Tier IV": 8000, "Tier V": 12000, "Tier VI": 18000, "Tier VII": 24000, "Tier I": 29000, "Tier II": 32000 },
+        "Temp Mercs": { "G-Mounted": 2530, "G-Flying": 25300, "G-Melee/Ranged": 1265, "S-Mounted": 2780, "S-Flying": 27800, "S-Melee/Ranged": 1390, "S-Scouts": 6950, "Siege": 12650, "Monster: Mounted": 5300, "Monster: Flying": 7585, "Monster: Melee/Ranged": 5000 }
+    };
+
+    function nuevoLider() {
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        div.innerHTML = `<select><option value="3000">${i18n[idm].her}</option><option value="3000">${i18n[idm].cap}</option></select>
+            <input type="number" class="lvl-lider" placeholder="Lvl" min="1" value="1">
+            <button onclick="this.parentElement.remove()" style="color:red; background:none; border:none; cursor:pointer;">✖</button>`;
+        document.getElementById('lista-lideres').appendChild(div);
+    }
+
+    function nuevaFilaTropa() {
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        const t_trans = i18n[idm].units;
+        let opt = Object.keys(DB_T).map(c => `<option value="${c}">${t_trans[c] || c}</option>`).join('');
+        div.innerHTML = `<select onchange="updateSubTropa(this)"><option value="">${i18n[idm].cat}</option>${opt}</select>
+            <select class="sub-t" style="display:none"></select>
+            <input type="number" class="qty" placeholder="${i18n[idm].cant}" min="1">
+            <button onclick="this.parentElement.remove()" style="color:red; background:none; border:none; cursor:pointer;">✖</button>`;
+        document.getElementById('lista-tropas').appendChild(div);
+    }
+
+    function updateSubTropa(sel) {
+        const sub = sel.parentElement.querySelector('.sub-t');
+        const t_trans = i18n[idm].units;
+        if(sel.value) {
+            sub.innerHTML = Object.entries(DB_T[sel.value]).map(([n,v]) => {
+                // Traducción inteligente para Tiers o nombres compuestos
+                let label = t_trans[n] || n;
+                if(n.includes("Tier")) label = label.replace("Tier", t_trans["Tier"]);
+                return `<option value="${v}">${label} (${v})</option>`;
+            }).join('');
+            sub.style.display = "block";
+        }
+    }
+
+    function nuevoRecurso() {
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        const t = i18n[idm];
+        div.innerHTML = `<select class="tipo-recurso"><option value="3000">${t.oro}</option><option value="4500">${t.ace}</option><option value="1">${t.pla}</option><option value="0">${t.pie}</option><option value="0">${t.mad}</option><option value="0">${t.hie}</option></select>
+            <input type="number" class="qty-recurso" placeholder="${t.cant}" min="1" value="1">
+            <button onclick="this.parentElement.remove()" style="color:red; background:none; border:none; cursor:pointer;">✖</button>`;
+        document.getElementById('lista-recursos').appendChild(div);
+    }
+
+    function calcular() {
+        let total = 0;
+        document.querySelectorAll('.lvl-lider').forEach(input => total += (parseInt(input.value) || 1) * 3000);
+        document.querySelectorAll('#lista-tropas .fila-dinamica').forEach(f => total += (parseInt(f.querySelector('.qty').value) || 0) * (parseInt(f.querySelector('.sub-t').value) || 0));
+        document.querySelectorAll('.qty-recurso').forEach(f => total += (parseInt(f.value) || 0) * (parseInt(f.parentElement.querySelector('select').value) || 0));
+        if(document.getElementById('check-portal').checked) total += 5000000;
+        total += (parseInt(document.getElementById('wall-lvl').value) || 0) * 1000000;
+        total += (parseInt(document.getElementById('fort-lvl').value) || 0) * 50000000;
+        total += (parseInt(document.getElementById('cap-lvl').value) || 0) * 450000000;
+        const isG = document.getElementById('m-o').checked;
+        document.getElementById('total-final').innerText = Math.round(isG ? total/3000 : total).toLocaleString();
+        document.getElementById('txt-moneda').innerText = isG ? i18n[idm].monedaOro : i18n[idm].monedaPlata;
+    }
+</script>
+</body>
+</html>
