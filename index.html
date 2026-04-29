@@ -6,7 +6,7 @@
     <title>K239 Kingdom Compensation Calculator</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); position: relative; }
+        .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
         .lang-selector { text-align: right; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; }
         h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; margin-top: 0; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
@@ -33,7 +33,7 @@
         </select>
     </div>
 
-    <h2 id="txt-titulo">Calculadora de Compensación K239</h2>
+    <h2 id="txt-titulo">Calculadora K239</h2>
     <div class="fixed-notice" id="txt-fixed">Base Ataque: +5M Plata incluido</div>
 
     <h3 id="txt-sec1">1. Líderes Capturados</h3>
@@ -49,7 +49,10 @@
     <button class="btn-add" id="btn-recurso" onclick="nuevoRecurso()">+ Añadir Recurso</button>
 
     <h3 id="txt-sec4">4. Edificios de Clan</h3>
-    <div style="margin-bottom:15px;"><input type="checkbox" id="check-portal" onchange="calcular()"><label id="lbl-portal" for="check-portal"> Portal Destruido (+5M Plata)</label></div>
+    <div style="margin-bottom:15px;">
+        <input type="checkbox" id="check-portal" onchange="calcular()">
+        <label id="lbl-portal" for="check-portal" style="cursor:pointer">Portal Destruido (+5M Plata)</label>
+    </div>
     
     <div class="grid-triple">
         <div class="caja-input"><label id="lbl-wall">Muros</label><input type="number" id="wall-lvl" placeholder="Lvl" oninput="calcular()"></div>
@@ -94,6 +97,7 @@
         const lang = document.getElementById('select-idioma').value;
         const t = i18n[lang];
 
+        // Títulos y etiquetas estáticas
         document.getElementById('txt-titulo').innerText = t.tit;
         document.getElementById('txt-fixed').innerText = t.fix;
         document.getElementById('txt-sec1').innerText = t.s1;
@@ -110,7 +114,21 @@
         document.getElementById('lbl-p').innerText = t.rp;
         document.getElementById('lbl-o').innerText = t.ro;
         document.getElementById('btn-share').innerText = t.bsh;
+
+        // --- TRADUCCIÓN DE ELEMENTOS INTERIORES YA CREADOS ---
+        // Traducir opciones de Líderes
+        document.querySelectorAll('#lista-lideres select option').forEach(opt => opt.text = t.hero);
         
+        // Traducir placeholders de Tropas y Recursos
+        document.querySelectorAll('.qty').forEach(input => input.placeholder = t.qty);
+        document.querySelectorAll('.qty-r').forEach(input => input.placeholder = t.qty);
+        
+        // Traducir opciones de Recursos (Oro/Plata)
+        document.querySelectorAll('.tipo-r').forEach(sel => {
+            sel.options[0].text = t.ro;
+            sel.options[1].text = t.rp;
+        });
+
         calcular();
     }
 
@@ -154,14 +172,19 @@
         <input type="number" class="qty-r" placeholder="${i18n[lang].qty}" oninput="calcular()">
         <button onclick="this.parentElement.remove(); calcular();" style="color:red;background:none;border:none;cursor:pointer">✖</button>`;
         document.getElementById('lista-recursos').appendChild(div);
+        calcular();
     }
 
     function calcular() {
         let p = 5000000;
         const lang = document.getElementById('select-idioma').value;
         document.querySelectorAll('.lvl-lider').forEach(i => p += (parseInt(i.value)||0)*3000);
-        document.querySelectorAll('.qty').forEach(i => p += (parseInt(i.value)||0)*(parseInt(i.parentElement.querySelector('.sub-t').value)||0));
+        document.querySelectorAll('.qty').forEach(i => {
+            const sub = i.parentElement.querySelector('.sub-t');
+            if(sub && sub.style.display !== 'none') p += (parseInt(i.value)||0)*(parseInt(sub.value)||0);
+        });
         document.querySelectorAll('.qty-r').forEach(i => p += (parseInt(i.value)||0)*(parseInt(i.parentElement.querySelector('.tipo-r').value)||0));
+        
         if(document.getElementById('check-portal').checked) p += 5000000;
         p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
         p += (parseInt(document.getElementById('fort-lvl').value)||0)*50000000;
