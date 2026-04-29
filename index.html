@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +8,10 @@
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); position: relative; }
         .lang-selector { text-align: right; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; }
-        h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
+        h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; margin-top: 0; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
-        .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px; transition: 0.3s; }
-        .btn-add:hover { background: #5da356; }
+        .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px; }
         .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
         .caja-input label { display: block; color: #d4af37; font-size: 0.85em; font-weight: bold; margin-bottom: 5px; }
@@ -21,56 +20,51 @@
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
         .btn-share { background: #d4af37; color: #1a110a; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; text-transform: uppercase; }
         .footer-clan { margin-top: 40px; text-align: center; color: #8b5a2b; font-weight: bold; letter-spacing: 3px; border-top: 1px solid #3d2b1f; padding-top: 20px; font-size: 1.2em; }
-        .fixed-notice { font-size: 0.9em; color: #aaa; margin-bottom: 10px; font-style: italic; }
-        .btn-del { color: #ff4d4d; background: none; border: none; font-size: 1.2em; cursor: pointer; font-weight: bold; }
+        .fixed-notice { font-size: 0.9em; color: #aaa; margin-bottom: 10px; font-style: italic; text-align: center; }
     </style>
 </head>
-<body onload="cambiarIdioma()">
+<body onload="actualizarInterfaz()">
 
 <div class="contenedor">
     <div class="lang-selector">
-        <select id="select-idioma" onchange="cambiarIdioma()">
-            <option value="en">English 🇬🇧</option>
+        <select id="select-idioma" onchange="actualizarInterfaz()">
             <option value="es" selected>Español 🇪🇸</option>
-            <option value="it">Italiano 🇮🇹</option>
-            <option value="pt">Português 🇧🇷</option>
+            <option value="en">English 🇬🇧</option>
         </select>
     </div>
 
-    <h2 id="txt-titulo">K239 Kingdom Compensation Calculator</h2>
-    <div class="fixed-notice" id="txt-fixed-attack">Base Attack: +5M Silver included</div>
+    <h2 id="txt-titulo">Calculadora de Compensación K239</h2>
+    <div class="fixed-notice" id="txt-fixed">Base Ataque: +5M Plata incluido</div>
 
-    <h3 id="txt-sec-lideres">1. Captured Leaders</h3>
+    <h3 id="txt-sec1">1. Líderes Capturados</h3>
     <div id="lista-lideres"></div>
-    <button class="btn-add" id="btn-add-lider" onclick="nuevoLider()">+ Add Leader</button>
+    <button class="btn-add" id="btn-lider" onclick="nuevoLider()">+ Añadir Líder</button>
 
-    <h3 id="txt-sec-tropas">2. Unit Losses</h3>
+    <h3 id="txt-sec2">2. Pérdidas de Tropas</h3>
     <div id="lista-tropas"></div>
-    <button class="btn-add" id="btn-add-tropa" onclick="nuevaFilaTropa()">+ Add Unit Row</button>
+    <button class="btn-add" id="btn-tropa" onclick="nuevaFilaTropa()">+ Añadir Tropa</button>
 
-    <h3 id="txt-sec-recursos">3. Stolen Resources</h3>
+    <h3 id="txt-sec3">3. Recursos Robados</h3>
     <div id="lista-recursos"></div>
-    <button class="btn-add" id="btn-add-recurso" onclick="nuevoRecurso()">+ Add Resource</button>
+    <button class="btn-add" id="btn-recurso" onclick="nuevoRecurso()">+ Añadir Recurso</button>
 
-    <h3 id="txt-sec-clan">4. Clan Buildings</h3>
-    <div style="margin-bottom:15px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
-        <input type="checkbox" id="check-portal" onchange="calcular()">
-        <label id="lbl-portal" for="check-portal" style="cursor:pointer">Portal Destroyed (+5M Silver)</label>
-    </div>
+    <h3 id="txt-sec4">4. Edificios de Clan</h3>
+    <div style="margin-bottom:15px;"><input type="checkbox" id="check-portal" onchange="calcular()"><label id="lbl-portal" for="check-portal"> Portal Destruido (+5M Plata)</label></div>
+    
     <div class="grid-triple">
-        <div class="caja-input"><label id="lbl-wall">City Walls</label><input type="number" id="wall-lvl" placeholder="Lvl" oninput="calcular()"></div>
-        <div class="caja-input"><label id="lbl-fort">Fortress</label><input type="number" id="fort-lvl" placeholder="Lvl" oninput="calcular()"></div>
+        <div class="caja-input"><label id="lbl-wall">Muros</label><input type="number" id="wall-lvl" placeholder="Lvl" oninput="calcular()"></div>
+        <div class="caja-input"><label id="lbl-fort">Fortaleza</label><input type="number" id="fort-lvl" placeholder="Lvl" oninput="calcular()"></div>
         <div class="caja-input"><label id="lbl-cap">Capital</label><input type="number" id="cap-lvl" placeholder="Lvl" oninput="calcular()"></div>
     </div>
 
     <div class="total-box">
         <div>
-            <input type="radio" name="m" value="p" id="m-p" onchange="calcular()"> <label for="m-p" id="lbl-silver-radio">Silver</label>
-            <input type="radio" name="m" value="o" id="m-o" checked onchange="calcular()"> <label for="m-o" id="lbl-gold-radio">Gold</label>
+            <input type="radio" name="m" id="m-p" onchange="calcular()"> <label for="m-p" id="lbl-p">Plata</label>
+            <input type="radio" name="m" id="m-o" checked onchange="calcular()"> <label for="m-o" id="lbl-o">Oro</label>
         </div>
         <span id="total-final">0</span>
-        <small id="txt-moneda-label">gold coins</small>
-        <button class="btn-share" id="btn-share" onclick="compartir()">Generate Summary</button>
+        <small id="txt-moneda">monedas de oro</small>
+        <button class="btn-share" id="btn-share" onclick="compartir()">Generar Resumen</button>
     </div>
 
     <div class="footer-clan">@WSB</div>
@@ -78,164 +72,115 @@
 
 <script>
     const i18n = {
-        en: { 
-            titulo: "K239 Kingdom Compensation Calculator", 
-            fixed: "Base Attack: +5M Silver included",
-            secLideres: "1. Captured Leaders", 
-            secTropas: "2. Unit Losses", 
-            secRecursos: "3. Stolen Resources", 
-            secClan: "4. Clan Buildings", 
-            btnAddLider: "+ Add Leader", 
-            btnAddTropa: "+ Add Unit Row", 
-            btnAddRecurso: "+ Add Resource", 
-            lblPortal: "Portal Destroyed (+5M Silver)", 
-            lblWall: "City Walls", 
-            lblFort: "Fortress", 
-            lblCap: "Capital", 
-            btnShare: "Generate Summary", 
-            shareTitle: "--- K239 COMPENSATION SUMMARY ---", 
-            her: "Hero", cap: "Captain", qty: "Qty", silver: "Silver", gold: "Gold", goldCoins: "gold coins"
+        es: {
+            tit: "Calculadora de Compensación K239", fix: "Base Ataque: +5M Plata incluido",
+            s1: "1. Líderes Capturados", s2: "2. Pérdidas de Tropas", s3: "3. Recursos Robados", s4: "4. Edificios de Clan",
+            bl: "+ Añadir Líder", bt: "+ Añadir Tropa", br: "+ Añadir Recurso",
+            lp: "Portal Destruido (+5M Plata)", lw: "Muros", lf: "Fortaleza", lc: "Capital",
+            rp: "Plata", ro: "Oro", bsh: "Generar Resumen", m_o: "monedas de oro", m_p: "plata",
+            hero: "Héroe", qty: "Cant", share: "--- RESUMEN K239 ---"
         },
-        es: { 
-            titulo: "Calculadora de Compensación K239", 
-            fixed: "Base Ataque: +5M Plata incluido",
-            secLideres: "1. Líderes Capturados", 
-            secTropas: "2. Pérdidas de Tropas", 
-            secRecursos: "3. Recursos Robados", 
-            secClan: "4. Edificios de Clan", 
-            btnAddLider: "+ Añadir Líder", 
-            btnAddTropa: "+ Añadir Tropa", 
-            btnAddRecurso: "+ Añadir Recurso", 
-            lblPortal: "Portal Destruido (+5M Plata)", 
-            lblWall: "Muros Ciudad", 
-            lblFort: "Fortaleza", 
-            lblCap: "Capital", 
-            btnShare: "Generar Resumen", 
-            shareTitle: "--- RESUMEN DE COMPENSACIÓN K239 ---", 
-            her: "Héroe", cap: "Capitán", qty: "Cant", silver: "Plata", gold: "Oro", goldCoins: "monedas de oro"
+        en: {
+            tit: "K239 Compensation Calculator", fix: "Base Attack: +5M Silver included",
+            s1: "1. Captured Leaders", s2: "2. Unit Losses", s3: "3. Stolen Resources", s4: "4. Clan Buildings",
+            bl: "+ Add Leader", bt: "+ Add Unit Row", br: "+ Add Resource",
+            lp: "Portal Destroyed (+5M Silver)", lw: "Walls", lf: "Fortress", lc: "Capital",
+            rp: "Silver", ro: "Gold", bsh: "Generate Summary", m_o: "gold coins", m_p: "silver",
+            hero: "Hero", qty: "Qty", share: "--- K239 SUMMARY ---"
         }
     };
 
-    let idm = 'es';
-    const DB_T = { 
-        "Guards": { "Mounted": 1265, "Flying": 12640, "Melee/Ranged": 630 }, 
-        "Specialists": { "Mounted": 1390, "Scouts": 6320 } 
-    };
+    function actualizarInterfaz() {
+        const lang = document.getElementById('select-idioma').value;
+        const t = i18n[lang];
 
-    function cambiarIdioma() {
-        idm = document.getElementById('select-idioma').value;
-        const t = i18n[idm] || i18n['en'];
-        
-        // Actualizar todos los textos de la interfaz
-        document.getElementById('txt-titulo').innerText = t.titulo;
-        document.getElementById('txt-fixed-attack').innerText = t.fixed;
-        document.getElementById('txt-sec-lideres').innerText = t.secLideres;
-        document.getElementById('txt-sec-tropas').innerText = t.secTropas;
-        document.getElementById('txt-sec-recursos').innerText = t.secRecursos;
-        document.getElementById('txt-sec-clan').innerText = t.secClan;
-        
-        document.getElementById('btn-add-lider').innerText = t.btnAddLider;
-        document.getElementById('btn-add-tropa').innerText = t.btnAddTropa;
-        document.getElementById('btn-add-recurso').innerText = t.btnAddRecurso;
-        
-        document.getElementById('lbl-portal').innerText = t.lblPortal;
-        document.getElementById('lbl-wall').innerText = t.lblWall;
-        document.getElementById('lbl-fort').innerText = t.lblFort;
-        document.getElementById('lbl-cap').innerText = t.lblCap;
-        
-        document.getElementById('lbl-silver-radio').innerText = t.silver;
-        document.getElementById('lbl-gold-radio').innerText = t.gold;
-        document.getElementById('btn-share').innerText = t.btnShare;
-
-        // Limpiar dinámicos para evitar mezcla de idiomas
-        document.getElementById('lista-lideres').innerHTML = '';
-        document.getElementById('lista-tropas').innerHTML = '';
-        document.getElementById('lista-recursos').innerHTML = '';
+        document.getElementById('txt-titulo').innerText = t.tit;
+        document.getElementById('txt-fixed').innerText = t.fix;
+        document.getElementById('txt-sec1').innerText = t.s1;
+        document.getElementById('txt-sec2').innerText = t.s2;
+        document.getElementById('txt-sec3').innerText = t.s3;
+        document.getElementById('txt-sec4').innerText = t.s4;
+        document.getElementById('btn-lider').innerText = t.bl;
+        document.getElementById('btn-tropa').innerText = t.bt;
+        document.getElementById('btn-recurso').innerText = t.br;
+        document.getElementById('lbl-portal').innerText = t.lp;
+        document.getElementById('lbl-wall').innerText = t.lw;
+        document.getElementById('lbl-fort').innerText = t.lf;
+        document.getElementById('lbl-cap').innerText = t.lc;
+        document.getElementById('lbl-p').innerText = t.rp;
+        document.getElementById('lbl-o').innerText = t.ro;
+        document.getElementById('btn-share').innerText = t.bsh;
         
         calcular();
     }
 
     function nuevoLider() {
+        const lang = document.getElementById('select-idioma').value;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `
-            <select><option value="3000">${i18n[idm].her}</option><option value="3000">${i18n[idm].cap}</option></select>
-            <input type="number" class="lvl-lider" value="1" min="1" oninput="calcular()">
-            <button class="btn-del" onclick="this.parentElement.remove(); calcular();">✖</button>`;
+        div.innerHTML = `<select><option>${i18n[lang].hero}</option></select>
+        <input type="number" class="lvl-lider" value="1" oninput="calcular()">
+        <button onclick="this.parentElement.remove(); calcular();" style="color:red;background:none;border:none;cursor:pointer">✖</button>`;
         document.getElementById('lista-lideres').appendChild(div);
         calcular();
     }
 
     function nuevaFilaTropa() {
+        const lang = document.getElementById('select-idioma').value;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        const cats = Object.keys(DB_T).map(c => `<option value="${c}">${c}</option>`).join('');
-        div.innerHTML = `
-            <select onchange="updateSub(this)"><option value="">Cat</option>${cats}</select>
-            <select class="sub-t" style="display:none" onchange="calcular()"></select>
-            <input type="number" class="qty" placeholder="${i18n[idm].qty}" min="1" oninput="calcular()">
-            <button class="btn-del" onclick="this.parentElement.remove(); calcular();">✖</button>`;
+        div.innerHTML = `<select onchange="u(this)"><option value="">Cat</option><option value="Guards">Guards</option><option value="Specialists">Specialists</option></select>
+        <select class="sub-t" style="display:none" onchange="calcular()"></select>
+        <input type="number" class="qty" placeholder="${i18n[lang].qty}" oninput="calcular()">
+        <button onclick="this.parentElement.remove(); calcular();" style="color:red;background:none;border:none;cursor:pointer">✖</button>`;
         document.getElementById('lista-tropas').appendChild(div);
     }
 
-    function updateSub(sel) {
-        const sub = sel.parentElement.querySelector('.sub-t');
-        if(sel.value) {
-            sub.innerHTML = Object.entries(DB_T[sel.value]).map(([n,v])=>`<option value="${v}">${n} (${v})</option>`).join('');
+    function u(s) {
+        const db = { "Guards": {"Mounted":1265, "Flying":12640}, "Specialists": {"Mounted":1390, "Scouts":6320}};
+        const sub = s.parentElement.querySelector('.sub-t');
+        if(s.value) {
+            sub.innerHTML = Object.entries(db[s.value]).map(([n,v])=>`<option value="${v}">${n}</option>`).join('');
             sub.style.display = "block";
-        } else {
-            sub.style.display = "none";
         }
         calcular();
     }
 
     function nuevoRecurso() {
+        const lang = document.getElementById('select-idioma').value;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `
-            <select class="tipo-res"><option value="3000">${i18n[idm].gold}</option><option value="1">${i18n[idm].silver}</option></select>
-            <input type="number" class="qty-res" placeholder="${i18n[idm].qty}" min="1" oninput="calcular()">
-            <button class="btn-del" onclick="this.parentElement.remove(); calcular();">✖</button>`;
+        div.innerHTML = `<select class="tipo-r"><option value="3000">${i18n[lang].ro}</option><option value="1">${i18n[lang].rp}</option></select>
+        <input type="number" class="qty-r" placeholder="${i18n[lang].qty}" oninput="calcular()">
+        <button onclick="this.parentElement.remove(); calcular();" style="color:red;background:none;border:none;cursor:pointer">✖</button>`;
         document.getElementById('lista-recursos').appendChild(div);
-        calcular();
     }
 
     function calcular() {
-        let totalPlata = 5000000; // Base fija de ataque
-        
-        document.querySelectorAll('.lvl-lider').forEach(i => totalPlata += (parseInt(i.value)||0)*3000);
-        document.querySelectorAll('.qty').forEach(i => {
-            let val = parseInt(i.parentElement.querySelector('.sub-t').value) || 0;
-            totalPlata += (parseInt(i.value)||0) * val;
-        });
-        document.querySelectorAll('.qty-res').forEach(i => {
-            let val = parseInt(i.parentElement.querySelector('.tipo-res').value) || 0;
-            totalPlata += (parseInt(i.value)||0) * val;
-        });
-        
-        if(document.getElementById('check-portal').checked) totalPlata += 5000000;
-        totalPlata += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
-        totalPlata += (parseInt(document.getElementById('fort-lvl').value)||0)*50000000;
-        totalPlata += (parseInt(document.getElementById('cap-lvl').value)||0)*450000000;
-        
-        const isGold = document.getElementById('m-o').checked;
-        document.getElementById('total-final').innerText = Math.round(isGold ? totalPlata/3000 : totalPlata).toLocaleString();
-        document.getElementById('txt-moneda-label').innerText = isGold ? i18n[idm].goldCoins : i18n[idm].silver;
-        return totalPlata;
+        let p = 5000000;
+        const lang = document.getElementById('select-idioma').value;
+        document.querySelectorAll('.lvl-lider').forEach(i => p += (parseInt(i.value)||0)*3000);
+        document.querySelectorAll('.qty').forEach(i => p += (parseInt(i.value)||0)*(parseInt(i.parentElement.querySelector('.sub-t').value)||0));
+        document.querySelectorAll('.qty-r').forEach(i => p += (parseInt(i.value)||0)*(parseInt(i.parentElement.querySelector('.tipo-r').value)||0));
+        if(document.getElementById('check-portal').checked) p += 5000000;
+        p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
+        p += (parseInt(document.getElementById('fort-lvl').value)||0)*50000000;
+        p += (parseInt(document.getElementById('cap-lvl').value)||0)*450000000;
+
+        const isO = document.getElementById('m-o').checked;
+        document.getElementById('total-final').innerText = Math.round(isO ? p/3000 : p).toLocaleString();
+        document.getElementById('txt-moneda').innerText = isO ? i18n[lang].m_o : i18n[lang].m_p;
+        return p;
     }
 
     function compartir() {
-        const plata = calcular();
-        const oro = Math.round(plata/3000);
-        const t = i18n[idm];
-        let txt = `${t.shareTitle}\nClan: @WSB\n\n`;
-        txt += `• ${t.fixed}\n`;
-        txt += `💰 TOTAL ${t.gold.toUpperCase()}: ${oro.toLocaleString()}\n`;
-        txt += `🪙 TOTAL ${t.silver.toUpperCase()}: ${plata.toLocaleString()}\n\n`;
-        txt += `Verified by K239 Calculator`;
-        
+        const p = calcular();
+        const o = Math.round(p/3000);
+        const lang = document.getElementById('select-idioma').value;
+        const t = i18n[lang];
+        let txt = `${t.share}\nClan: @WSB\n\n• ${t.fix}\n💰 TOTAL ${t.ro}: ${o.toLocaleString()}\n🪙 TOTAL ${t.rp}: ${p.toLocaleString()}\n\nVerified by @WSB K239 Tool`;
         navigator.clipboard.writeText(txt);
-        alert(idm === 'es' ? "¡Resumen copiado!" : "Summary copied!");
+        alert(lang === 'es' ? "¡Resumen copiado!" : "Summary copied!");
     }
 </script>
 </body>
