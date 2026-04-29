@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Kingdom Compensation Calculator V24</title>
+    <title>K239 Calculator V25 - Strict Limit</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 850px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -11,8 +11,10 @@
         h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; margin-top: 0; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
-        .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px; }
-        .btn-add:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
+        .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px; transition: 0.3s; }
+        .btn-add:hover:not(:disabled) { background: #5da356; }
+        /* Estilo para botón desactivado */
+        .btn-add:disabled { background: #444 !important; color: #888; cursor: not-allowed; border: 1px solid #555; }
         .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
         .caja-input label { display: block; color: #d4af37; font-size: 0.85em; font-weight: bold; margin-bottom: 5px; }
@@ -37,7 +39,7 @@
     <h2 id="txt-titulo">Calculadora K239</h2>
     <div class="fixed-notice" id="txt-fixed">Base Ataque: +5M Plata incluido</div>
 
-    <h3 id="txt-sec1">1. Líderes Capturados (Máx 1 Héroe, 3 Caps)</h3>
+    <h3 id="txt-sec1">1. Líderes (Máx 4: 1 Héroe + 3 Caps)</h3>
     <div id="lista-lideres"></div>
     <button class="btn-add" id="btn-lider" onclick="nuevoLider()">+ Añadir Líder</button>
 
@@ -75,7 +77,7 @@
     const i18n = {
         es: {
             tit: "Calculadora de Compensación K239", fix: "Base Ataque: +5M Plata incluido",
-            s1: "1. Líderes Capturados (Máx 1 Héroe, 3 Caps)", s2: "2. Pérdidas de Tropas", s3: "3. Recursos Robados", s4: "4. Edificios de Clan",
+            s1: "1. Líderes (Máx 4: 1 Héroe + 3 Caps)", s2: "2. Pérdidas de Tropas", s3: "3. Recursos Robados", s4: "4. Edificios de Clan",
             bl: "+ Añadir Líder", bt: "+ Añadir Tropa", br: "+ Añadir Recurso",
             lp: "Portal Destruido (+5M Plata)", lw: "Muros", lf: "Fortaleza", lc: "Capital",
             rp: "Plata", ro: "Oro", bsh: "Generar Resumen", m_o: "monedas de oro", m_p: "plata",
@@ -85,7 +87,7 @@
         },
         en: {
             tit: "K239 Compensation Calculator", fix: "Base Attack: +5M Silver included",
-            s1: "1. Captured Leaders (Max 1 Hero, 3 Caps)", s2: "2. Unit Losses", s3: "3. Stolen Resources", s4: "4. Clan Buildings",
+            s1: "1. Leaders (Max 4: 1 Hero + 3 Caps)", s2: "2. Unit Losses", s3: "3. Stolen Resources", s4: "4. Clan Buildings",
             bl: "+ Add Leader", bt: "+ Add Unit Row", br: "+ Add Resource",
             lp: "Portal Destroyed (+5M Silver)", lw: "Walls", lf: "Fortress", lc: "Capital",
             rp: "Silver", ro: "Gold", bsh: "Generate Summary", m_o: "gold coins", m_p: "silver",
@@ -95,7 +97,6 @@
         }
     };
 
-    // Base de datos de tropas basada en tus capturas
     const dbTropas = {
         "Guards": { "Mounted": 1265, "Flying": 12640, "MeleeRanged": 630 },
         "Specialists": { "Mounted": 1390, "Flying": 13900, "MeleeRanged": 695, "Scouts": 6320 },
@@ -124,34 +125,69 @@
         document.getElementById('lbl-o').innerText = t.ro;
         document.getElementById('btn-share').innerText = t.bsh;
 
-        // Traducir menús de tropas existentes
         document.querySelectorAll('.fila-tropa').forEach(fila => {
             const catSel = fila.querySelector('.cat-sel');
             const subSel = fila.querySelector('.sub-t');
-            const catVal = catSel.value;
-            const subVal = subSel.value;
-
-            // Traducir categorías
-            catSel.options[1].text = t.Guards;
-            catSel.options[2].text = t.Specialists;
-            catSel.options[3].text = t.Siege;
-            catSel.options[4].text = t.Monster;
-
-            // Si hay una categoría seleccionada, refrescar las opciones hijas traducidas
-            if(catVal) u(catSel, subVal);
+            if(catSel.value) u(catSel, subSel.value);
         });
 
-        // Traducir placeholders y otros elementos
-        document.querySelectorAll('.qty').forEach(i => i.placeholder = t.qty);
-        document.querySelectorAll('.qty-r').forEach(i => i.placeholder = t.qty);
         document.querySelectorAll('.sel-tipo-lider').forEach(sel => {
+            const current = sel.value;
             sel.options[0].text = t.hero;
             sel.options[1].text = t.cap;
+            sel.value = current;
         });
 
+        checkLimitesLideres();
         calcular();
     }
 
+    // --- BLOQUEO ESTRICTO DE LÍDERES ---
+    function nuevoLider() {
+        const lista = document.getElementById('lista-lideres');
+        // Bloqueo de seguridad nivel 1: Cantidad de hijos
+        if (lista.children.length >= 4) {
+            checkLimitesLideres();
+            return; 
+        }
+
+        const lang = document.getElementById('select-idioma').value;
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        div.innerHTML = `
+            <select class="sel-tipo-lider" onchange="vL(this)">
+                <option value="hero">${i18n[lang].hero}</option>
+                <option value="cap">${i18n[lang].cap}</option>
+            </select>
+            <input type="number" class="lvl-lider" value="1" min="1" oninput="calcular()">
+            <button onclick="this.parentElement.remove(); checkLimitesLideres();" style="color:red;background:none;border:none;cursor:pointer;font-weight:bold;">✖</button>`;
+        
+        lista.appendChild(div);
+        vL(div.querySelector('select'));
+        checkLimitesLideres();
+    }
+
+    function vL(s) {
+        const all = document.querySelectorAll('.sel-tipo-lider');
+        let h = 0, c = 0;
+        all.forEach(sel => { if(sel.value==='hero') h++; else c++; });
+        
+        // Bloqueo nivel 2: Tipos (Max 1 Héroe, Max 3 Caps)
+        if(h > 1) { s.value = 'cap'; } 
+        else if(c > 3) { s.value = 'hero'; }
+        
+        calcular();
+    }
+
+    function checkLimitesLideres() {
+        const total = document.querySelectorAll('.sel-tipo-lider').length;
+        const btn = document.getElementById('btn-lider');
+        // Bloqueo nivel 3: Desactivar botón visualmente
+        btn.disabled = (total >= 4);
+        calcular();
+    }
+
+    // --- RESTO DE FUNCIONES (Tropas y Recursos) ---
     function nuevaFilaTropa() {
         const lang = document.getElementById('select-idioma').value;
         const t = i18n[lang];
@@ -167,7 +203,7 @@
             </select>
             <select class="sub-t" style="display:none" onchange="calcular()"></select>
             <input type="number" class="qty" placeholder="${t.qty}" oninput="calcular()">
-            <button onclick="this.parentElement.remove(); calcular();" style="color:red;background:none;border:none;cursor:pointer">✖</button>`;
+            <button onclick="this.parentElement.remove(); calcular();" style="color:red;background:none;border:none;cursor:pointer;font-weight:bold;">✖</button>`;
         document.getElementById('lista-tropas').appendChild(div);
     }
 
@@ -180,30 +216,7 @@
                 `<option value="${val}" ${val == valorPrevio ? 'selected' : ''}>${i18n[lang][key] || key}</option>`
             ).join('');
             sub.style.display = "block";
-        } else {
-            sub.style.display = "none";
-        }
-        calcular();
-    }
-
-    // Funciones de Líderes y Recursos (Sin cambios significativos)
-    function nuevoLider() {
-        const lista = document.getElementById('lista-lideres');
-        const lang = document.getElementById('select-idioma').value;
-        if (lista.children.length >= 4) return;
-        const div = document.createElement('div');
-        div.className = 'fila-dinamica';
-        div.innerHTML = `<select class="sel-tipo-lider" onchange="vL(this)"><option value="hero">${i18n[lang].hero}</option><option value="cap">${i18n[lang].cap}</option></select>
-        <input type="number" class="lvl-lider" value="1" min="1" oninput="calcular()"><button onclick="this.parentElement.remove(); calcular();" style="color:red;background:none;border:none;cursor:pointer">✖</button>`;
-        lista.appendChild(div);
-        vL(div.querySelector('select'));
-    }
-
-    function vL(s) {
-        let h = 0, c = 0;
-        document.querySelectorAll('.sel-tipo-lider').forEach(sel => { if(sel.value==='hero') h++; else c++; });
-        if(h > 1) s.value = 'cap'; else if(c > 3) s.value = 'hero';
-        document.getElementById('btn-lider').disabled = (document.querySelectorAll('.sel-tipo-lider').length >= 4);
+        } else { sub.style.display = "none"; }
         calcular();
     }
 
@@ -212,7 +225,7 @@
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
         div.innerHTML = `<select class="tipo-r"><option value="3000">${i18n[lang].ro}</option><option value="1">${i18n[lang].rp}</option></select>
-        <input type="number" class="qty-r" placeholder="${i18n[lang].qty}" oninput="calcular()"><button onclick="this.parentElement.remove(); calcular();" style="color:red;background:none;border:none;cursor:pointer">✖</button>`;
+        <input type="number" class="qty-r" placeholder="${i18n[lang].qty}" oninput="calcular()"><button onclick="this.parentElement.remove(); calcular();" style="color:red;background:none;border:none;cursor:pointer;font-weight:bold;">✖</button>`;
         document.getElementById('lista-recursos').appendChild(div);
     }
 
