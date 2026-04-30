@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V30 - 8 Languages Edition</title>
+    <title>K239 Calculator V31 - No Negative Values</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -56,9 +56,9 @@
 
     <h3 id="txt-sec4">4. Buildings</h3>
     <div class="grid-triple">
-        <div class="caja-input"><label id="lbl-wall">Walls</label><input type="number" id="wall-lvl" placeholder="Lvl" oninput="calcular()"></div>
-        <div class="caja-input"><label id="lbl-fort">Fortress</label><input type="number" id="fort-lvl" placeholder="Lvl" oninput="calcular()"></div>
-        <div class="caja-input"><label id="lbl-cap">Capital</label><input type="number" id="cap-lvl" placeholder="Lvl" oninput="calcular()"></div>
+        <div class="caja-input"><label id="lbl-wall">Walls</label><input type="number" id="wall-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
+        <div class="caja-input"><label id="lbl-fort">Fortress</label><input type="number" id="fort-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
+        <div class="caja-input"><label id="lbl-cap">Capital</label><input type="number" id="cap-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
     </div>
     <div style="margin-top:15px;"><input type="checkbox" id="check-portal" onchange="calcular()"><label id="lbl-portal" for="check-portal"> Portal Destroyed (+5M)</label></div>
 
@@ -149,7 +149,7 @@
                 <option value="Monsters">${i18n[lang].Monsters}</option>
             </select>
             <select class="sub-sel" style="display:none" onchange="calcular()"></select>
-            <input type="number" class="qty" placeholder="${i18n[lang].qty}" oninput="calcular()">
+            <input type="number" class="qty" min="0" placeholder="${i18n[lang].qty}" oninput="calcular()">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-' + tipo).appendChild(div);
     }
@@ -175,7 +175,7 @@
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
         div.innerHTML = `<select class="l-type" onchange="vL(this)"><option value="h">${i18n[lang].Hero}</option><option value="c">${i18n[lang].Captain}</option></select>
-        <input type="number" class="l-lvl" value="1" oninput="calcular()"><button onclick="this.parentElement.remove(); checkL();" class="del-btn">✖</button>`;
+        <input type="number" class="l-lvl" min="0" value="1" oninput="calcular()"><button onclick="this.parentElement.remove(); checkL();" class="del-btn">✖</button>`;
         document.getElementById('lista-lideres').appendChild(div);
         vL(div.querySelector('select'));
     }
@@ -194,14 +194,18 @@
 
     function calcular() {
         let p = 5000000;
-        document.querySelectorAll('.l-lvl').forEach(i => p += (parseInt(i.value)||0)*3000);
+        // Leaders: min 0 protection
+        document.querySelectorAll('.l-lvl').forEach(i => p += Math.max(0, (parseInt(i.value)||0))*3000);
+        // Troops/Mercenaries: min 0 protection
         document.querySelectorAll('.qty').forEach(i => {
             const sub = i.parentElement.querySelector('.sub-sel');
-            if(sub && sub.style.display !== 'none') p += (parseInt(i.value)||0) * (parseInt(sub.value)||0);
+            if(sub && sub.style.display !== 'none') p += Math.max(0, (parseInt(i.value)||0)) * (parseInt(sub.value)||0);
         });
-        p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
-        p += (parseInt(document.getElementById('fort-lvl').value)||0)*50000000;
-        p += (parseInt(document.getElementById('cap-lvl').value)||0)*450000000;
+        // Buildings: min 0 protection
+        p += Math.max(0, (parseInt(document.getElementById('wall-lvl').value)||0))*1000000;
+        p += Math.max(0, (parseInt(document.getElementById('fort-lvl').value)||0))*50000000;
+        p += Math.max(0, (parseInt(document.getElementById('cap-lvl').value)||0))*450000000;
+        
         if(document.getElementById('check-portal').checked) p += 5000000;
         const isO = document.getElementById('m-o').checked;
         document.getElementById('total-final').innerText = Math.round(isO ? p/3000 : p).toLocaleString();
