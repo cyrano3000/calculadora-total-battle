@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V28 - Global Edition</title>
+    <title>K239 Calculator V30 - 8 Languages Edition</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -16,26 +16,33 @@
         .btn-add:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
         .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
-        .caja-input label { display: block; color: #d4af37; font-size: 0.85em; font-weight: bold; margin-bottom: 5px; }
         input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
         .del-btn { color:red; background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.2em; padding: 0 10px; }
+        .rtl { direction: rtl; text-align: right; }
+        .rtl h3 { border-left: none; border-right: 5px solid #8b5a2b; padding-right: 15px; }
     </style>
 </head>
 <body onload="actualizarInterfaz()">
 
-<div class="contenedor">
+<div class="contenedor" id="main-cont">
     <div class="lang-selector">
         <select id="select-idioma" onchange="actualizarInterfaz()">
             <option value="en" selected>English 🇬🇧</option>
             <option value="es">Español 🇪🇸</option>
+            <option value="fr">Français 🇫🇷</option>
+            <option value="it">Italiano 🇮🇹</option>
+            <option value="de">Deutsch 🇩🇪</option>
+            <option value="pt">Português 🇧🇷</option>
+            <option value="ru">Русский 🇷🇺</option>
+            <option value="ar">العربية 🇦🇪</option>
         </select>
     </div>
 
     <h2 id="txt-titulo">K239 Calculator</h2>
 
-    <h3 id="txt-sec1">1. Leaders (Max 4 total)</h3>
+    <h3 id="txt-sec1">1. Leaders</h3>
     <div id="lista-lideres"></div>
     <button class="btn-add" id="btn-lider" onclick="nuevoLider()">+ Add Leader</button>
 
@@ -47,7 +54,7 @@
     <div id="lista-mercenarios"></div>
     <button class="btn-add" id="btn-add-mercenarios" onclick="nuevaFila('mercenarios')">+ Add Mercenary</button>
 
-    <h3 id="txt-sec4">4. Buildings & Others</h3>
+    <h3 id="txt-sec4">4. Buildings</h3>
     <div class="grid-triple">
         <div class="caja-input"><label id="lbl-wall">Walls</label><input type="number" id="wall-lvl" placeholder="Lvl" oninput="calcular()"></div>
         <div class="caja-input"><label id="lbl-fort">Fortress</label><input type="number" id="fort-lvl" placeholder="Lvl" oninput="calcular()"></div>
@@ -66,20 +73,14 @@
 
 <script>
     const i18n = {
-        en: {
-            tit: "K239 Compensation Calculator", s1: "1. Leaders (Max 4 total)", s2: "2. Barracks Troops", s3: "3. Temporary Mercenaries", s4: "4. Buildings & Others",
-            bl: "+ Add Leader", bc: "+ Add Barracks Troop", bm: "+ Add Mercenary", lp: "Portal Destroyed (+5M)",
-            lw: "Walls", lf: "Fortress", lc: "Capital", rp: "Silver", ro: "Gold", qty: "Qty",
-            Mounted: "Mounted", Volador: "Flying", Melee: "Melee / Ranged", Scouts: "Scouts", Siege: "Siege",
-            Guards: "Guards", Specialists: "Specialists", Monsters: "Monsters", Hero: "Hero", Captain: "Captain"
-        },
-        es: {
-            tit: "Calculadora de Compensación K239", s1: "1. Líderes (Máx 4 total)", s2: "2. Tropas de Cuartel", s3: "3. Mercenarios Temporales", s4: "4. Edificios y Otros",
-            bl: "+ Añadir Líder", bc: "+ Añadir Tropa de Cuartel", bm: "+ Añadir Mercenario", lp: "Portal Destruido (+5M)",
-            lw: "Muros", lf: "Fortaleza", lc: "Capital", rp: "Plata", ro: "Oro", qty: "Cant",
-            Mounted: "Montadas", Volador: "Voladora", Melee: "Cuerpo a cuerpo / Distancia", Scouts: "Exploradores", Siege: "Asedio",
-            Guards: "Guardias", Specialists: "Especialistas", Monsters: "Monstruos", Hero: "Héroe", Captain: "Capitán"
-        }
+        en: { tit: "K239 Compensation Calculator", s1: "1. Leaders (Max 4)", s2: "2. Barracks Troops", s3: "3. Temporary Mercenaries", s4: "4. Buildings & Others", bl: "+ Add Leader", bc: "+ Add Barracks Troop", bm: "+ Add Mercenary", lp: "Portal Destroyed (+5M)", lw: "Walls", lf: "Fortress", lc: "Capital", rp: "Silver", ro: "Gold", qty: "Qty", Mounted: "Mounted", Volador: "Flying", Melee: "Melee / Ranged", Scouts: "Scouts", Siege: "Siege", Guards: "Guards", Specialists: "Specialists", Monsters: "Monsters", Hero: "Hero", Captain: "Captain" },
+        es: { tit: "Calculadora de Compensación K239", s1: "1. Líderes (Máx 4)", s2: "2. Tropas de Cuartel", s3: "3. Mercenarios Temporales", s4: "4. Edificios y Otros", bl: "+ Añadir Líder", bc: "+ Añadir Tropa de Cuartel", bm: "+ Añadir Mercenario", lp: "Portal Destruido (+5M)", lw: "Muros", lf: "Fortaleza", lc: "Capital", rp: "Plata", ro: "Oro", qty: "Cant", Mounted: "Montadas", Volador: "Voladora", Melee: "Cuerpo a cuerpo / Distancia", Scouts: "Exploradores", Siege: "Asedio", Guards: "Guardias", Specialists: "Especialistas", Monsters: "Monstruos", Hero: "Héroe", Captain: "Capitán" },
+        fr: { tit: "Calculateur de Compensation K239", s1: "1. Chefs (Max 4)", s2: "2. Troupes de Caserne", s3: "3. Mercenaires Temporaires", s4: "4. Bâtiments", bl: "+ Ajouter Chef", bc: "+ Ajouter Troupe", bm: "+ Ajouter Mercenaire", lp: "Portail Détruit (+5M)", lw: "Murs", lf: "Forteresse", lc: "Capitale", rp: "Argent", ro: "Or", qty: "Qté", Mounted: "Monté", Volador: "Volant", Melee: "Mêlée / Portée", Scouts: "Éclaireurs", Siege: "Siège", Guards: "Gardes", Specialists: "Spécialistes", Monsters: "Monstres", Hero: "Héros", Captain: "Capitaine" },
+        it: { tit: "Calcolatore Compensazione K239", s1: "1. Leader (Max 4)", s2: "2. Truppe Caserma", s3: "3. Mercenari Temporanei", s4: "4. Edifici", bl: "+ Aggiungi Leader", bc: "+ Aggiungi Truppa", bm: "+ Aggiungi Mercenario", lp: "Portale Distrutto (+5M)", lw: "Mura", lf: "Fortezza", lc: "Capitale", rp: "Argento", ro: "Oro", qty: "Qtà", Mounted: "Montata", Volador: "Volante", Melee: "Mischia / Distanza", Scouts: "Esploratori", Siege: "Assedio", Guards: "Guardie", Specialists: "Specialisti", Monsters: "Mostri", Hero: "Eroe", Captain: "Capitano" },
+        de: { tit: "K239 Entschädigungsrechner", s1: "1. Anführer (Max 4)", s2: "2. Kasernentruppen", s3: "3. Temporäre Söldner", s4: "4. Gebäude", bl: "+ Anführer hinzufügen", bc: "+ Truppe hinzufügen", bm: "+ Söldner hinzufügen", lp: "Portal zerstört (+5M)", lw: "Wände", lf: "Festung", lc: "Hauptstadt", rp: "Silber", ro: "Gold", qty: "Menge", Mounted: "Beritten", Volador: "Fliegend", Melee: "Nahkampf / Fernkampf", Scouts: "Späher", Siege: "Belagerung", Guards: "Wachen", Specialists: "Spezialisten", Monsters: "Monster", Hero: "Held", Captain: "Hauptmann" },
+        pt: { tit: "Calculadora de Compensação K239", s1: "1. Líderes (Máx 4)", s2: "2. Tropas de Quartel", s3: "3. Mercenários Temporários", s4: "4. Edifícios", bl: "+ Adicionar Líder", bc: "+ Adicionar Tropa", bm: "+ Adicionar Mercenário", lp: "Portal Destruído (+5M)", lw: "Muralhas", lf: "Fortaleza", lc: "Capital", rp: "Prata", ro: "Ouro", qty: "Qtd", Mounted: "Montada", Volador: "Voadora", Melee: "Corpo a corpo / Distância", Scouts: "Exploradores", Siege: "Cerco", Guards: "Guardas", Specialists: "Especialistas", Monsters: "Monstros", Hero: "Herói", Captain: "Capitão" },
+        ru: { tit: "Калькулятор компенсации K239", s1: "1. Лидеры (Макс 4)", s2: "2. Войска казармы", s3: "3. Временные наемники", s4: "4. Здания", bl: "+ Добавить лидера", bc: "+ Добавить войска", bm: "+ Добавить наемника", lp: "Портал разрушен (+5M)", lw: "Стены", lf: "Крепость", lc: "Столица", rp: "Серебро", ro: "Золото", qty: "Кол-во", Mounted: "Конница", Volador: "Летающие", Melee: "Ближний / Дальний бой", Scouts: "Разведчики", Siege: "Осада", Guards: "Стражи", Specialists: "Специалисты", Monsters: "Монстры", Hero: "Герой", Captain: "Капитан" },
+        ar: { tit: "حاسبة تعويضات K239", s1: "1. القادة (الحد الأقصى 4)", s2: "2. قوات الثكنات", s3: "3. المرتزقة المؤقتون", s4: "4. المباني", bl: "+ إضافة قائد", bc: "+ إضافة قوات", bm: "+ إضافة مرتزق", lp: "البوابة مدمرة (+5M)", lw: "الجدران", lf: "الحصن", lc: "العاصمة", rp: "فضة", ro: "ذهب", qty: "الكمية", Mounted: "خيالة", Volador: "طيران", Melee: "اشتباك / بعيد", Scouts: "كشافة", Siege: "حصار", Guards: "حراس", Specialists: "متخصصون", Monsters: "وحوش", Hero: "بطل", Captain: "قائد" }
     };
 
     const dbCuartel = {
@@ -99,6 +100,8 @@
     function actualizarInterfaz() {
         const lang = document.getElementById('select-idioma').value;
         const t = i18n[lang];
+        const cont = document.getElementById('main-cont');
+        if(lang === 'ar') cont.classList.add('rtl'); else cont.classList.remove('rtl');
 
         document.getElementById('txt-titulo').innerText = t.tit;
         document.getElementById('txt-sec1').innerText = t.s1;
@@ -115,7 +118,6 @@
         document.getElementById('lbl-p').innerText = t.rp;
         document.getElementById('lbl-o').innerText = t.ro;
 
-        // Traducir dinámicamente filas existentes
         document.querySelectorAll('.l-type').forEach(sel => {
             const val = sel.value;
             sel.options[0].text = t.Hero; sel.options[1].text = t.Captain;
@@ -124,38 +126,30 @@
 
         document.querySelectorAll('.fila-tropa').forEach(fila => {
             const catSel = fila.querySelector('.cat-sel');
-            const subSel = fila.querySelector('.sub-sel');
-            const tipo = fila.dataset.tipo;
-            const currentCat = catSel.value;
-            const currentSubVal = subSel.value;
-
             catSel.options[1].text = t.Guards;
             catSel.options[2].text = t.Specialists;
             catSel.options[3].text = t.Siege;
             catSel.options[4].text = t.Monsters;
-            
-            if(currentCat) updateSub(catSel, tipo, currentSubVal);
+            if(catSel.value) updateSub(catSel, fila.dataset.tipo, fila.querySelector('.sub-sel').value);
         });
-
         calcular();
     }
 
     function nuevaFila(tipo) {
         const lang = document.getElementById('select-idioma').value;
-        const t = i18n[lang];
         const div = document.createElement('div');
         div.className = 'fila-dinamica fila-tropa';
         div.dataset.tipo = tipo;
         div.innerHTML = `
             <select class="cat-sel" onchange="updateSub(this, '${tipo}')">
                 <option value="">Cat</option>
-                <option value="Guards">${t.Guards}</option>
-                <option value="Specialists">${t.Specialists}</option>
-                <option value="Siege">${t.Siege}</option>
-                <option value="Monsters">${t.Monsters}</option>
+                <option value="Guards">${i18n[lang].Guards}</option>
+                <option value="Specialists">${i18n[lang].Specialists}</option>
+                <option value="Siege">${i18n[lang].Siege}</option>
+                <option value="Monsters">${i18n[lang].Monsters}</option>
             </select>
             <select class="sub-sel" style="display:none" onchange="calcular()"></select>
-            <input type="number" class="qty" placeholder="${t.qty}" oninput="calcular()">
+            <input type="number" class="qty" placeholder="${i18n[lang].qty}" oninput="calcular()">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-' + tipo).appendChild(div);
     }
@@ -168,7 +162,7 @@
         if(cat) {
             sub.innerHTML = Object.entries(db[cat]).map(([k, v]) => {
                 const label = (cat === 'Monsters' && tipo === 'cuartel') ? `Lvl ${k}` : (i18n[lang][k] || k);
-                return `<option value="${v}" ${v == valorPrevio ? 'selected' : ''}>${label} (Cost: ${v.toLocaleString()})</option>`;
+                return `<option value="${v}" ${v == valorPrevio ? 'selected' : ''}>${label} (${v.toLocaleString()})</option>`;
             }).join('');
             sub.style.display = 'block';
         } else { sub.style.display = 'none'; }
@@ -178,13 +172,10 @@
     function nuevoLider() {
         if (document.querySelectorAll('.l-type').length >= 4) return;
         const lang = document.getElementById('select-idioma').value;
-        const t = i18n[lang];
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `
-            <select class="l-type" onchange="vL(this)"><option value="h">${t.Hero}</option><option value="c">${t.Captain}</option></select>
-            <input type="number" class="l-lvl" value="1" oninput="calcular()">
-            <button onclick="this.parentElement.remove(); checkL();" class="del-btn">✖</button>`;
+        div.innerHTML = `<select class="l-type" onchange="vL(this)"><option value="h">${i18n[lang].Hero}</option><option value="c">${i18n[lang].Captain}</option></select>
+        <input type="number" class="l-lvl" value="1" oninput="calcular()"><button onclick="this.parentElement.remove(); checkL();" class="del-btn">✖</button>`;
         document.getElementById('lista-lideres').appendChild(div);
         vL(div.querySelector('select'));
     }
@@ -212,7 +203,6 @@
         p += (parseInt(document.getElementById('fort-lvl').value)||0)*50000000;
         p += (parseInt(document.getElementById('cap-lvl').value)||0)*450000000;
         if(document.getElementById('check-portal').checked) p += 5000000;
-
         const isO = document.getElementById('m-o').checked;
         document.getElementById('total-final').innerText = Math.round(isO ? p/3000 : p).toLocaleString();
     }
