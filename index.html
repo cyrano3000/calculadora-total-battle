@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V27 - Cuartel & Mercenarios</title>
+    <title>K239 Calculator V28 - Global Edition</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -12,7 +12,7 @@
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; transition: 0.3s; }
-        .btn-add:hover { background: #5da356; }
+        .btn-add:hover:not(:disabled) { background: #5da356; }
         .btn-add:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
         .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
@@ -28,57 +28,60 @@
 <div class="contenedor">
     <div class="lang-selector">
         <select id="select-idioma" onchange="actualizarInterfaz()">
-            <option value="es" selected>Español 🇪🇸</option>
-            <option value="en">English 🇬🇧</option>
+            <option value="en" selected>English 🇬🇧</option>
+            <option value="es">Español 🇪🇸</option>
         </select>
     </div>
 
-    <h2 id="txt-titulo">Calculadora K239</h2>
+    <h2 id="txt-titulo">K239 Calculator</h2>
 
-    <h3 id="txt-sec1">1. Líderes (Máx 4 total)</h3>
+    <h3 id="txt-sec1">1. Leaders (Max 4 total)</h3>
     <div id="lista-lideres"></div>
-    <button class="btn-add" id="btn-lider" onclick="nuevoLider()">+ Añadir Líder</button>
+    <button class="btn-add" id="btn-lider" onclick="nuevoLider()">+ Add Leader</button>
 
-    <h3 id="txt-sec2">2. Tropas de Cuartel (Fijas)</h3>
+    <h3 id="txt-sec2">2. Barracks Troops</h3>
     <div id="lista-cuartel"></div>
-    <button class="btn-add" onclick="nuevaFila('cuartel')">+ Añadir Tropa de Cuartel</button>
+    <button class="btn-add" id="btn-add-cuartel" onclick="nuevaFila('cuartel')">+ Add Barracks Troop</button>
 
-    <h3 id="txt-sec3">3. Mercenarios Temporales</h3>
+    <h3 id="txt-sec3">3. Temporary Mercenaries</h3>
     <div id="lista-mercenarios"></div>
-    <button class="btn-add" onclick="nuevaFila('mercenarios')">+ Añadir Mercenario</button>
+    <button class="btn-add" id="btn-add-mercenarios" onclick="nuevaFila('mercenarios')">+ Add Mercenary</button>
 
-    <h3 id="txt-sec4">4. Edificios y Otros</h3>
+    <h3 id="txt-sec4">4. Buildings & Others</h3>
     <div class="grid-triple">
-        <div class="caja-input"><label id="lbl-wall">Muros</label><input type="number" id="wall-lvl" placeholder="Lvl" oninput="calcular()"></div>
-        <div class="caja-input"><label id="lbl-fort">Fortaleza</label><input type="number" id="fort-lvl" placeholder="Lvl" oninput="calcular()"></div>
+        <div class="caja-input"><label id="lbl-wall">Walls</label><input type="number" id="wall-lvl" placeholder="Lvl" oninput="calcular()"></div>
+        <div class="caja-input"><label id="lbl-fort">Fortress</label><input type="number" id="fort-lvl" placeholder="Lvl" oninput="calcular()"></div>
         <div class="caja-input"><label id="lbl-cap">Capital</label><input type="number" id="cap-lvl" placeholder="Lvl" oninput="calcular()"></div>
     </div>
-    <div style="margin-top:15px;"><input type="checkbox" id="check-portal" onchange="calcular()"><label id="lbl-portal" for="check-portal"> Portal Destruido (+5M)</label></div>
+    <div style="margin-top:15px;"><input type="checkbox" id="check-portal" onchange="calcular()"><label id="lbl-portal" for="check-portal"> Portal Destroyed (+5M)</label></div>
 
     <div class="total-box">
         <span id="total-final">0</span>
         <div style="margin-top:10px;">
-            <input type="radio" name="m" id="m-p" onchange="calcular()"> <label for="m-p">Plata</label>
-            <input type="radio" name="m" id="m-o" checked onchange="calcular()"> <label for="m-o">Oro</label>
+            <input type="radio" name="m" id="m-p" onchange="calcular()"> <label for="m-p" id="lbl-p">Silver</label>
+            <input type="radio" name="m" id="m-o" checked onchange="calcular()"> <label for="m-o" id="lbl-o">Gold</label>
         </div>
     </div>
 </div>
 
 <script>
     const i18n = {
-        es: {
-            tit: "Calculadora de Compensación K239", s1: "1. Líderes (Máx 4 total)", s2: "2. Tropas de Cuartel", s3: "3. Mercenarios Temporales",
-            Mounted: "Montadas", Volador: "Voladora", Melee: "Cuerpo a cuerpo / Distancia", Scouts: "Exploradores", Siege: "Asedio",
-            Guards: "Guardias", Specialists: "Especialistas", Monsters: "Monstruos", qty: "Cant"
-        },
         en: {
-            tit: "K239 Compensation Calculator", s1: "1. Leaders (Max 4)", s2: "2. Barracks Troops", s3: "3. Temporary Mercenaries",
+            tit: "K239 Compensation Calculator", s1: "1. Leaders (Max 4 total)", s2: "2. Barracks Troops", s3: "3. Temporary Mercenaries", s4: "4. Buildings & Others",
+            bl: "+ Add Leader", bc: "+ Add Barracks Troop", bm: "+ Add Mercenary", lp: "Portal Destroyed (+5M)",
+            lw: "Walls", lf: "Fortress", lc: "Capital", rp: "Silver", ro: "Gold", qty: "Qty",
             Mounted: "Mounted", Volador: "Flying", Melee: "Melee / Ranged", Scouts: "Scouts", Siege: "Siege",
-            Guards: "Guards", Specialists: "Specialists", Monsters: "Monsters", qty: "Qty"
+            Guards: "Guards", Specialists: "Specialists", Monsters: "Monsters", Hero: "Hero", Captain: "Captain"
+        },
+        es: {
+            tit: "Calculadora de Compensación K239", s1: "1. Líderes (Máx 4 total)", s2: "2. Tropas de Cuartel", s3: "3. Mercenarios Temporales", s4: "4. Edificios y Otros",
+            bl: "+ Añadir Líder", bc: "+ Añadir Tropa de Cuartel", bm: "+ Añadir Mercenario", lp: "Portal Destruido (+5M)",
+            lw: "Muros", lf: "Fortaleza", lc: "Capital", rp: "Plata", ro: "Oro", qty: "Cant",
+            Mounted: "Montadas", Volador: "Voladora", Melee: "Cuerpo a cuerpo / Distancia", Scouts: "Exploradores", Siege: "Asedio",
+            Guards: "Guardias", Specialists: "Especialistas", Monsters: "Monstruos", Hero: "Héroe", Captain: "Capitán"
         }
     };
 
-    // VALORES CUARTEL
     const dbCuartel = {
         "Guards": { "Mounted": 1250, "Volador": 12500, "Melee": 625 },
         "Specialists": { "Mounted": 1400, "Melee": 700, "Scouts": 3500 },
@@ -86,7 +89,6 @@
         "Monsters": { "I": 29000, "II": 32000, "III": 4000, "IV": 8000, "V": 12000, "VI": 18000, "VII": 24000 }
     };
 
-    // VALORES MERCENARIOS
     const dbMercenarios = {
         "Guards": { "Mounted": 2500, "Volador": 25000, "Melee": 1250 },
         "Specialists": { "Mounted": 2800, "Volador": 28000, "Melee": 1400, "Scouts": 7000 },
@@ -96,47 +98,93 @@
 
     function actualizarInterfaz() {
         const lang = document.getElementById('select-idioma').value;
-        document.getElementById('txt-titulo').innerText = i18n[lang].tit;
+        const t = i18n[lang];
+
+        document.getElementById('txt-titulo').innerText = t.tit;
+        document.getElementById('txt-sec1').innerText = t.s1;
+        document.getElementById('txt-sec2').innerText = t.s2;
+        document.getElementById('txt-sec3').innerText = t.s3;
+        document.getElementById('txt-sec4').innerText = t.s4;
+        document.getElementById('btn-lider').innerText = t.bl;
+        document.getElementById('btn-add-cuartel').innerText = t.bc;
+        document.getElementById('btn-add-mercenarios').innerText = t.bm;
+        document.getElementById('lbl-portal').innerText = t.lp;
+        document.getElementById('lbl-wall').innerText = t.lw;
+        document.getElementById('lbl-fort').innerText = t.lf;
+        document.getElementById('lbl-cap').innerText = t.lc;
+        document.getElementById('lbl-p').innerText = t.rp;
+        document.getElementById('lbl-o').innerText = t.ro;
+
+        // Traducir dinámicamente filas existentes
+        document.querySelectorAll('.l-type').forEach(sel => {
+            const val = sel.value;
+            sel.options[0].text = t.Hero; sel.options[1].text = t.Captain;
+            sel.value = val;
+        });
+
+        document.querySelectorAll('.fila-tropa').forEach(fila => {
+            const catSel = fila.querySelector('.cat-sel');
+            const subSel = fila.querySelector('.sub-sel');
+            const tipo = fila.dataset.tipo;
+            const currentCat = catSel.value;
+            const currentSubVal = subSel.value;
+
+            catSel.options[1].text = t.Guards;
+            catSel.options[2].text = t.Specialists;
+            catSel.options[3].text = t.Siege;
+            catSel.options[4].text = t.Monsters;
+            
+            if(currentCat) updateSub(catSel, tipo, currentSubVal);
+        });
+
         calcular();
     }
 
     function nuevaFila(tipo) {
         const lang = document.getElementById('select-idioma').value;
-        const db = tipo === 'cuartel' ? dbCuartel : dbMercenarios;
+        const t = i18n[lang];
         const div = document.createElement('div');
-        div.className = 'fila-dinamica';
+        div.className = 'fila-dinamica fila-tropa';
+        div.dataset.tipo = tipo;
         div.innerHTML = `
             <select class="cat-sel" onchange="updateSub(this, '${tipo}')">
                 <option value="">Cat</option>
-                <option value="Guards">${i18n[lang].Guards}</option>
-                <option value="Specialists">${i18n[lang].Specialists}</option>
-                <option value="Siege">${i18n[lang].Siege}</option>
-                <option value="Monsters">${i18n[lang].Monsters}</option>
+                <option value="Guards">${t.Guards}</option>
+                <option value="Specialists">${t.Specialists}</option>
+                <option value="Siege">${t.Siege}</option>
+                <option value="Monsters">${t.Monsters}</option>
             </select>
             <select class="sub-sel" style="display:none" onchange="calcular()"></select>
-            <input type="number" class="qty" placeholder="Cant" oninput="calcular()">
+            <input type="number" class="qty" placeholder="${t.qty}" oninput="calcular()">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-' + tipo).appendChild(div);
     }
 
-    function updateSub(sel, tipo) {
+    function updateSub(sel, tipo, valorPrevio = null) {
         const db = tipo === 'cuartel' ? dbCuartel : dbMercenarios;
         const lang = document.getElementById('select-idioma').value;
         const sub = sel.parentElement.querySelector('.sub-sel');
         const cat = sel.value;
         if(cat) {
-            sub.innerHTML = Object.entries(db[cat]).map(([k, v]) => `<option value="${v}">${i18n[lang][k] || k} (${v})</option>`).join('');
+            sub.innerHTML = Object.entries(db[cat]).map(([k, v]) => {
+                const label = (cat === 'Monsters' && tipo === 'cuartel') ? `Lvl ${k}` : (i18n[lang][k] || k);
+                return `<option value="${v}" ${v == valorPrevio ? 'selected' : ''}>${label} (Cost: ${v.toLocaleString()})</option>`;
+            }).join('');
             sub.style.display = 'block';
         } else { sub.style.display = 'none'; }
         calcular();
     }
 
     function nuevoLider() {
-        if (document.getElementById('lista-lideres').children.length >= 4) return;
+        if (document.querySelectorAll('.l-type').length >= 4) return;
+        const lang = document.getElementById('select-idioma').value;
+        const t = i18n[lang];
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `<select class="l-type" onchange="vL(this)"><option value="h">Héroe</option><option value="c">Capitán</option></select>
-        <input type="number" class="l-lvl" value="1" oninput="calcular()"><button onclick="this.parentElement.remove(); checkL();" class="del-btn">✖</button>`;
+        div.innerHTML = `
+            <select class="l-type" onchange="vL(this)"><option value="h">${t.Hero}</option><option value="c">${t.Captain}</option></select>
+            <input type="number" class="l-lvl" value="1" oninput="calcular()">
+            <button onclick="this.parentElement.remove(); checkL();" class="del-btn">✖</button>`;
         document.getElementById('lista-lideres').appendChild(div);
         vL(div.querySelector('select'));
     }
@@ -154,11 +202,11 @@
     }
 
     function calcular() {
-        let p = 5000000; // Base inicial
+        let p = 5000000;
         document.querySelectorAll('.l-lvl').forEach(i => p += (parseInt(i.value)||0)*3000);
         document.querySelectorAll('.qty').forEach(i => {
-            const val = i.parentElement.querySelector('.sub-sel').value;
-            p += (parseInt(i.value)||0) * (parseInt(val)||0);
+            const sub = i.parentElement.querySelector('.sub-sel');
+            if(sub && sub.style.display !== 'none') p += (parseInt(i.value)||0) * (parseInt(sub.value)||0);
         });
         p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
         p += (parseInt(document.getElementById('fort-lvl').value)||0)*50000000;
