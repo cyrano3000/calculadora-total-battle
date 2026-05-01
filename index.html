@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V44 - Orden Monstruos</title>
+    <title>K239 Calculator V45 - Orden Corregido</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -60,19 +60,37 @@
 </div>
 
 <script>
-    // Base de datos con el orden de monstruos solicitado: III, IV, V, VI, VII, I, II
+    // Se ha forzado el orden manual en el objeto para asegurar que I y II aparezcan al final
     const dbPrecios = {
         "Cuartel": {
-            "Guardia Montada": 1250, "Guardia Voladora": 12500, "Guardia C.C. / Distancia": 625,
-            "Espec. Montada": 1400, "Espec. Voladora": 28000, "Espec. C.C. / Distancia": 700, "Espec. Explorador": 3500,
+            "Guardia Montada": 1250, 
+            "Guardia Voladora": 12500, 
+            "Guardia C.C. / Distancia": 625,
+            "Espec. Montada": 1400, 
+            "Espec. Voladora": 28000, 
+            "Espec. C.C. / Distancia": 700, 
+            "Espec. Explorador": 3500,
             "Asedio": 6250, 
-            "Monstruo III": 4000, "Monstruo IV": 8000, "Monstruo V": 12000, "Monstruo VI": 18000, "Monstruo VII": 24000,
-            "Monstruo I": 29000, "Monstruo II": 32000
+            "Monstruo III": 4000, 
+            "Monstruo IV": 8000, 
+            "Monstruo V": 12000, 
+            "Monstruo VI": 18000, 
+            "Monstruo VII": 24000,
+            "Monstruo I": 29000, 
+            "Monstruo II": 32000
         },
         "Mercenario": {
-            "Merc. Montada": 2500, "Merc. Voladora": 25000, "Merc. C.C. / Distancia": 1250,
-            "M. Espec. Montada": 2800, "M. Espec. Voladora": 28000, "M. Espec. C.C. / Distancia": 1400, "M. Espec. Explorador": 7000,
-            "Merc. Asedio": 12500, "Monst. Montada": 5300, "Monst. Voladora": 7600, "Monst. C.C. / Distancia": 5000
+            "Merc. Montada": 2500, 
+            "Merc. Voladora": 25000, 
+            "Merc. C.C. / Distancia": 1250,
+            "M. Espec. Montada": 2800, 
+            "M. Espec. Voladora": 28000, 
+            "M. Espec. C.C. / Distancia": 1400, 
+            "M. Espec. Explorador": 7000,
+            "Merc. Asedio": 12500, 
+            "Monst. Montada": 5300, 
+            "Monst. Voladora": 7600, 
+            "Monst. C.C. / Distancia": 5000
         }
     };
 
@@ -97,6 +115,7 @@
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
         let options = "";
+        // El bucle for...in respeta el orden de inserción en navegadores modernos
         for (let t in dbPrecios[tipo]) {
             options += `<option value="${dbPrecios[tipo][t]}">${t} (${dbPrecios[tipo][t].toLocaleString()})</option>`;
         }
