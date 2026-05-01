@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V46 - Multilingual</title>
+    <title>K239 Calculator V47 - Fixed Language Button</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
-        .header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8b5a2b; margin-bottom: 15px; }
-        h2 { color: #d4af37; text-transform: uppercase; letter-spacing: 2px; margin: 0; padding-bottom: 5px; }
-        .lang-btn { background: #8b5a2b; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; }
-        .alerta-multa { background: #4a0f0f; color: #ffcccc; border: 2px solid #ff4d4d; padding: 15px; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 20px; }
+        .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); position: relative; }
+        
+        /* Ajuste del encabezado para que el botón sea visible */
+        .header-area { display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #8b5a2b; margin-bottom: 15px; padding-bottom: 10px; position: relative; }
+        h2 { color: #d4af37; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+        .lang-btn { position: absolute; right: 0; background: #8b5a2b; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; }
+        .lang-btn:hover { background: #d4af37; color: #1a110a; }
+
+        .alerta-multa { background: #4a0f0f; color: #ffcccc; border: 2px solid #ff4d4d; padding: 15px; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 20px; text-transform: uppercase; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; transition: 0.3s; }
@@ -20,13 +24,13 @@
         input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
-        .del-btn { color:red; background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.2em; padding: 0 10px; }
+        .del-btn { color:red; background:none; border:none; cursor:pointer; font-weight:bold; font-size: 1.2em; padding: 0 10px; }
     </style>
 </head>
 <body onload="init()">
 
 <div class="contenedor">
-    <div class="header-flex">
+    <div class="header-area">
         <h2 id="txt-titulo">Calculadora K239</h2>
         <button class="lang-btn" onclick="toggleLang()" id="btn-lang">English</button>
     </div>
@@ -144,13 +148,14 @@
         document.getElementById('txt-oro').innerText = t.oro;
         document.getElementById('btn-report').innerText = t.report;
 
-        // Actualizar selects existentes
+        // Actualizar selects de líderes
         document.querySelectorAll('.l-type').forEach(s => {
             const val = s.value;
             s.innerHTML = `<option value="Héroe" ${val==='Héroe'?'selected':''}>${t.hero}</option>
                            <option value="Capitán" ${val==='Capitán'?'selected':''}>${t.captain}</option>`;
         });
 
+        // Actualizar selects de tropas (Respetando el orden de monstruos)
         document.querySelectorAll('.t-tipo').forEach(s => {
             const val = s.value;
             const cat = s.getAttribute('data-cat');
