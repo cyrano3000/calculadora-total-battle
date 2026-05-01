@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V41 - ULTRA DETAIL</title>
+    <title>K239 Calculator V42 - Final Units</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -12,13 +12,14 @@
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; transition: 0.3s; }
-        .btn-report { background: #d4af37; color: #1a110a; border: none; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1.2em; text-transform: uppercase; }
+        .btn-report { background: #d4af37; color: #1a110a; border: none; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1.2em; text-transform: uppercase; transition: 0.3s; }
+        .btn-report:hover { background: #f4e4bc; transform: scale(1.01); }
         .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
         input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
-        .del-btn { color:red; background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.2em; }
+        .del-btn { color:red; background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.2em; padding: 0 10px; }
     </style>
 </head>
 <body onload="calcular()">
@@ -56,16 +57,17 @@
 </div>
 
 <script>
+    // Actualización de nombres: C.C. / Distancia
     const dbPrecios = {
         "Cuartel": {
-            "Guardia Montada": 1250, "Guardia Voladora": 12500, "Guardia C.C.": 625,
-            "Espec. Montada": 1400, "Espec. Voladora": 28000, "Espec. C.C.": 700, "Espec. Explorador": 3500,
+            "G. Montada": 1250, "G. Voladora": 12500, "G. C.C. / Distancia": 625,
+            "E. Montada": 1400, "E. Voladora": 28000, "E. C.C. / Distancia": 700, "E. Explorador": 3500,
             "Asedio": 6250, "Monstruo I": 29000, "Monstruo II": 32000, "Monstruo III": 4000, "Monstruo IV": 8000, "Monstruo V": 12000, "Monstruo VI": 18000, "Monstruo VII": 24000
         },
         "Mercenario": {
-            "Merc. Montada": 2500, "Merc. Voladora": 25000, "Merc. C.C.": 1250,
-            "Merc. Esp. Montada": 2800, "Merc. Esp. Voladora": 28000, "Merc. Esp. C.C.": 1400, "Merc. Esp. Explorador": 7000,
-            "Merc. Asedio": 12500, "Monst. Montada": 5300, "Monst. Voladora": 7600, "Monst. C.C.": 5000
+            "M. Montada": 2500, "M. Voladora": 25000, "M. C.C. / Distancia": 1250,
+            "M. E. Montada": 2800, "M. E. Voladora": 28000, "M. E. C.C. / Distancia": 1400, "M. E. Explorador": 7000,
+            "M. Asedio": 12500, "Monst. Montada": 5300, "Monst. Voladora": 7600, "Monst. C.C.": 5000
         }
     };
 
@@ -92,7 +94,7 @@
         let options = "";
         for (let cat in dbPrecios) {
             for (let t in dbPrecios[cat]) {
-                options += `<option value="${dbPrecios[cat][t]}">[${cat}] ${t}</option>`;
+                options += `<option value="${dbPrecios[cat][t]}">[${cat}] ${t} (${dbPrecios[cat][t].toLocaleString()})</option>`;
             }
         }
         div.innerHTML = `<select class="t-tipo" onchange="calcular()">${options}</select>
@@ -113,7 +115,7 @@
     function calcular() {
         let p = 5000000;
         document.querySelectorAll('.l-lvl').forEach(i => p += (parseInt(i.value)||0)*3000);
-        document.querySelectorAll('.fila-dinamica').forEach(f => {
+        document.querySelectorAll('#lista-tropas .fila-dinamica').forEach(f => {
             const q = f.querySelector('.t-qty');
             const v = f.querySelector('.t-tipo');
             if(q && v) p += (parseInt(q.value)||0) * (parseInt(v.value)||0);
@@ -144,7 +146,7 @@
         document.querySelectorAll('#lista-tropas .fila-dinamica').forEach(t => {
             const qty = t.querySelector('.t-qty').value || 0;
             const sel = t.querySelector('.t-tipo');
-            const nombre = sel.options[sel.selectedIndex].text;
+            const nombre = sel.options[sel.selectedIndex].text.split(' (')[0];
             const precio = parseInt(sel.value);
             if(qty > 0) inf += `⚔️ ${nombre} x${parseInt(qty).toLocaleString()}: ${((qty*precio)/f).toLocaleString()} ${mon}\n`;
         });
@@ -164,7 +166,7 @@
 
         inf += `━━━━━━━━━━━━━━━━━━━━━\n💰 **TOTAL FINAL: ${document.getElementById('total-final').innerText} ${mon}**\n━━━━━━━━━━━━━━━━━━━━━\n@K239`;
 
-        navigator.clipboard.writeText(inf).then(() => alert("✅ Informe detallado copiado."));
+        navigator.clipboard.writeText(inf).then(() => alert("✅ Informe detallado copiado al portapapeles."));
     }
 </script>
 </body>
