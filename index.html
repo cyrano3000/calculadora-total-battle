@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V40 - Detailed Report</title>
+    <title>K239 Calculator V41 - ULTRA DETAIL</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -12,15 +12,13 @@
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; transition: 0.3s; }
-        .btn-add:hover { background: #5da356; }
-        .btn-report { background: #d4af37; color: #1a110a; border: none; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1.2em; text-transform: uppercase; transition: 0.3s; }
-        .btn-report:hover { background: #f4e4bc; transform: scale(1.01); }
+        .btn-report { background: #d4af37; color: #1a110a; border: none; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1.2em; text-transform: uppercase; }
         .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
         input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
-        .del-btn { color:red; background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.2em; padding: 0 10px; }
+        .del-btn { color:red; background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.2em; }
     </style>
 </head>
 <body onload="calcular()">
@@ -29,26 +27,22 @@
     <h2>Calculadora K239</h2>
     <div class="alerta-multa">⚠️ Multa de Ataque: 5,000,000 Plata (Fija)</div>
 
-    <h3>1. Líderes (Máx 1 Héroe / 3 Cap.)</h3>
+    <h3>1. Líderes</h3>
     <div id="lista-lideres"></div>
     <button class="btn-add" id="btn-lider" onclick="nuevoLider()">+ Añadir Líder</button>
 
-    <h3>2. Tropas de Cuartel</h3>
-    <div id="lista-cuartel"></div>
-    <button class="btn-add" onclick="nuevaFila('cuartel')">+ Añadir Tropa de Cuartel</button>
+    <h3>2. Tropas (Cuartel y Mercenarios)</h3>
+    <div id="lista-tropas"></div>
+    <button class="btn-add" onclick="nuevaFilaTropa()">+ Añadir Tropa</button>
 
-    <h3>3. Mercenarios Temporales</h3>
-    <div id="lista-mercenarios"></div>
-    <button class="btn-add" onclick="nuevaFila('mercenarios')">+ Añadir Mercenario</button>
-
-    <h3>4. Edificios y Otros</h3>
+    <h3>3. Edificios</h3>
     <div id="lista-fortalezas"></div>
     <button class="btn-add" id="btn-add-fort" onclick="nuevaFortaleza()">+ Añadir Fortaleza (Máx 4)</button>
     
     <div class="grid-triple">
         <div class="caja-input"><label>Muros</label><input type="number" id="wall-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
         <div class="caja-input"><label>Capital (1-25)</label><input type="number" id="cap-lvl" min="0" max="25" placeholder="Nivel" oninput="validarSimple(this)"></div>
-        <div class="caja-input"><label>Portal</label><div style="margin-top:5px;"><input type="checkbox" id="check-portal" onchange="calcular()"><span> Destruido (+5M)</span></div></div>
+        <div class="caja-input"><label>Portal</label><div style="margin-top:5px;"><input type="checkbox" id="check-portal" onchange="calcular()"><span> Destruido</span></div></div>
     </div>
 
     <div class="total-box">
@@ -57,160 +51,120 @@
             <input type="radio" name="m" id="m-p" onchange="calcular()"> <label for="m-p">Plata</label>
             <input type="radio" name="m" id="m-o" checked onchange="calcular()"> <label for="m-o">Oro</label>
         </div>
-        <button class="btn-report" onclick="generarInforme()">📋 Generar Informe Detallado @K239</button>
+        <button class="btn-report" onclick="generarInforme()">📋 Copiar Informe Desglosado @K239</button>
     </div>
 </div>
 
 <script>
-    const dbCuartel = {
-        "Guards": { "Montadas": 1250, "Voladora": 12500, "Cuerpo a cuerpo": 625 },
-        "Specialists": { "Montadas": 1400, "Voladora": 28000, "Cuerpo a cuerpo": 700, "Exploradores": 3500 },
-        "Siege": { "Asedio": 6250 },
-        "Monsters": { "I": 29000, "II": 32000, "III": 4000, "IV": 8000, "V": 12000, "VI": 18000, "VII": 24000 }
-    };
-
-    const dbMercenarios = {
-        "Guards": { "Montadas": 2500, "Voladora": 25000, "Cuerpo a cuerpo": 1250 },
-        "Specialists": { "Montadas": 2800, "Voladora": 28000, "Cuerpo a cuerpo": 1400, "Exploradores": 7000 },
-        "Siege": { "Asedio": 12500 },
-        "Monsters": { "Montadas": 5300, "Voladora": 7600, "Cuerpo a cuerpo": 5000 }
+    const dbPrecios = {
+        "Cuartel": {
+            "Guardia Montada": 1250, "Guardia Voladora": 12500, "Guardia C.C.": 625,
+            "Espec. Montada": 1400, "Espec. Voladora": 28000, "Espec. C.C.": 700, "Espec. Explorador": 3500,
+            "Asedio": 6250, "Monstruo I": 29000, "Monstruo II": 32000, "Monstruo III": 4000, "Monstruo IV": 8000, "Monstruo V": 12000, "Monstruo VI": 18000, "Monstruo VII": 24000
+        },
+        "Mercenario": {
+            "Merc. Montada": 2500, "Merc. Voladora": 25000, "Merc. C.C.": 1250,
+            "Merc. Esp. Montada": 2800, "Merc. Esp. Voladora": 28000, "Merc. Esp. C.C.": 1400, "Merc. Esp. Explorador": 7000,
+            "Merc. Asedio": 12500, "Monst. Montada": 5300, "Monst. Voladora": 7600, "Monst. C.C.": 5000
+        }
     };
 
     function validarSimple(input) {
-        let v = input.value;
-        if (v !== "" && parseInt(v) > 25) input.value = 25;
-        if (v !== "" && parseInt(v) < 0) input.value = 0;
+        if (input.value !== "" && parseInt(input.value) > 25) input.value = 25;
+        if (input.value !== "" && parseInt(input.value) < 0) input.value = 0;
         calcular();
     }
 
     function nuevoLider() {
         if (document.querySelectorAll('.l-type').length >= 4) return;
-        const hasHero = Array.from(document.querySelectorAll('.l-type')).some(s => s.value === 'h');
-        const defaultType = hasHero ? 'c' : 'h';
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `
-            <select class="l-type" onchange="validarHeroe(this)">
-                <option value="h" ${defaultType === 'h' ? 'selected' : ''}>Héroe</option>
-                <option value="c" ${defaultType === 'c' ? 'selected' : ''}>Capitán</option>
-            </select>
-            <input type="number" class="l-lvl" min="0" value="1" oninput="calcular()">
-            <button onclick="this.parentElement.remove(); checkButtons();" class="del-btn">✖</button>`;
+        div.innerHTML = `<select class="l-type"><option value="Héroe">Héroe</option><option value="Capitán">Capitán</option></select>
+            <input type="number" class="l-lvl" placeholder="Nivel" value="1" oninput="calcular()">
+            <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-lideres').appendChild(div);
-        checkButtons();
+        calcular();
     }
 
-    function validarHeroe(sel) {
-        const selects = document.querySelectorAll('.l-type');
-        let count = 0;
-        selects.forEach(s => { if(s.value === 'h') count++; });
-        if (count > 1) { alert("Solo 1 Héroe permitido"); sel.value = 'c'; }
-        calcular();
+    function nuevaFilaTropa() {
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        let options = "";
+        for (let cat in dbPrecios) {
+            for (let t in dbPrecios[cat]) {
+                options += `<option value="${dbPrecios[cat][t]}">[${cat}] ${t}</option>`;
+            }
+        }
+        div.innerHTML = `<select class="t-tipo" onchange="calcular()">${options}</select>
+            <input type="number" class="t-qty" placeholder="Cant" oninput="calcular()">
+            <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
+        document.getElementById('lista-tropas').appendChild(div);
     }
 
     function nuevaFortaleza() {
         if (document.querySelectorAll('.fort-lvl').length >= 4) return;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `
-            <span style="flex-grow:1">Fortaleza</span>
-            <input type="number" class="fort-lvl" min="0" max="25" placeholder="Lvl" style="width:100px" oninput="validarSimple(this)">
-            <button onclick="this.parentElement.remove(); checkButtons();" class="del-btn">✖</button>`;
-        document.getElementById('lista-fortalezas').appendChild(div);
-        checkButtons();
-    }
-
-    function nuevaFila(tipo) {
-        const div = document.createElement('div');
-        div.className = 'fila-dinamica';
-        div.innerHTML = `
-            <select class="cat-sel" onchange="updateSub(this, '${tipo}')">
-                <option value="">Categoría</option>
-                <option value="Guards">Guardias</option>
-                <option value="Specialists">Especialistas</option>
-                <option value="Siege">Asedio</option>
-                <option value="Monsters">Monstruos</option>
-            </select>
-            <select class="sub-sel" style="display:none" onchange="calcular()"></select>
-            <input type="number" class="qty" min="0" placeholder="Cant" oninput="calcular()">
+        div.innerHTML = `<span>Fortaleza</span><input type="number" class="fort-lvl" placeholder="Lvl" oninput="validarSimple(this)">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
-        document.getElementById('lista-' + tipo).appendChild(div);
-    }
-
-    function updateSub(sel, tipo) {
-        const db = tipo === 'cuartel' ? dbCuartel : dbMercenarios;
-        const sub = sel.parentElement.querySelector('.sub-sel');
-        if(sel.value) {
-            sub.innerHTML = Object.entries(db[sel.value]).map(([k,v]) => `<option value="${v}">${k} (${v.toLocaleString()})</option>`).join('');
-            sub.style.display = 'block';
-        } else { sub.style.display = 'none'; }
-        calcular();
-    }
-
-    function checkButtons() {
-        document.getElementById('btn-lider').disabled = (document.querySelectorAll('.l-type').length >= 4);
-        document.getElementById('btn-add-fort').disabled = (document.querySelectorAll('.fort-lvl').length >= 4);
-        calcular();
+        document.getElementById('lista-fortalezas').appendChild(div);
     }
 
     function calcular() {
-        let p = 5000000; 
+        let p = 5000000;
         document.querySelectorAll('.l-lvl').forEach(i => p += (parseInt(i.value)||0)*3000);
-        document.querySelectorAll('.qty').forEach(i => {
-            const sub = i.parentElement.querySelector('.sub-sel');
-            if(sub && sub.style.display !== 'none') p += (parseInt(i.value)||0) * (parseInt(sub.value)||0);
+        document.querySelectorAll('.fila-dinamica').forEach(f => {
+            const q = f.querySelector('.t-qty');
+            const v = f.querySelector('.t-tipo');
+            if(q && v) p += (parseInt(q.value)||0) * (parseInt(v.value)||0);
         });
         document.querySelectorAll('.fort-lvl').forEach(i => p += (parseInt(i.value)||0)*50000000);
         p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
-        const capVal = parseInt(document.getElementById('cap-lvl').value)||0;
-        if(capVal > 0) p += capVal * 450000000;
+        const cv = parseInt(document.getElementById('cap-lvl').value)||0;
+        if(cv > 0) p += cv * 450000000;
         if(document.getElementById('check-portal').checked) p += 5000000;
+        
         const isO = document.getElementById('m-o').checked;
         document.getElementById('total-final').innerText = Math.round(isO ? p/3000 : p).toLocaleString();
     }
 
     function generarInforme() {
         const isOro = document.getElementById('m-o').checked;
-        const factor = isOro ? 3000 : 1;
-        const moneda = isOro ? "Oro" : "Plata";
-        
-        let subLideres = 0;
-        document.querySelectorAll('.l-lvl').forEach(i => subLideres += (parseInt(i.value)||0)*3000);
-        
-        let subTropas = 0;
-        document.querySelectorAll('.qty').forEach(i => {
-            const sub = i.parentElement.querySelector('.sub-sel');
-            if(sub && sub.style.display !== 'none') subTropas += (parseInt(i.value)||0) * (parseInt(sub.value)||0);
+        const f = isOro ? 3000 : 1;
+        const mon = isOro ? "Oro" : "Plata";
+        let inf = `📊 **INFORME DE MULTA DETALLADO K239**\n━━━━━━━━━━━━━━━━━━━━━\n`;
+        inf += `✅ Multa Base: ${(5000000/f).toLocaleString()} ${mon}\n`;
+
+        document.querySelectorAll('#lista-lideres .fila-dinamica').forEach(l => {
+            const tipo = l.querySelector('.l-type').value;
+            const lvl = l.querySelector('.l-lvl').value || 0;
+            inf += `👤 ${tipo} (Lvl ${lvl}): ${((lvl*3000)/f).toLocaleString()} ${mon}\n`;
         });
 
-        let subForts = 0;
-        document.querySelectorAll('.fort-lvl').forEach(i => subForts += (parseInt(i.value)||0)*50000000);
-        
-        const subMuros = (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
-        const capLvl = parseInt(document.getElementById('cap-lvl').value)||0;
-        const subCap = capLvl * 450000000;
-        const subPortal = document.getElementById('check-portal').checked ? 5000000 : 0;
-        const totalFinal = document.getElementById('total-final').innerText;
-
-        let informe = `📊 **INFORME DETALLADO K239**\n`;
-        informe += `━━━━━━━━━━━━━━━━━━━━━\n`;
-        informe += `🔸 Multa Base: 5,000,000 Plata\n`;
-        
-        if(subLideres > 0) informe += `🔸 Líderes/Capitanes: ${(subLideres/factor).toLocaleString()} ${moneda}\n`;
-        if(subTropas > 0) informe += `🔸 Tropas/Mercenarios: ${(subTropas/factor).toLocaleString()} ${moneda}\n`;
-        if(subForts > 0) informe += `🔸 Fortalezas: ${(subForts/factor).toLocaleString()} ${moneda}\n`;
-        if(subMuros > 0) informe += `🔸 Daños en Muros: ${(subMuros/factor).toLocaleString()} ${moneda}\n`;
-        if(subCap > 0) informe += `🔸 Capital (Lvl ${capLvl}): ${(subCap/factor).toLocaleString()} ${moneda}\n`;
-        if(subPortal > 0) informe += `🔸 Portal Destruido: ${(subPortal/factor).toLocaleString()} ${moneda}\n`;
-        
-        informe += `━━━━━━━━━━━━━━━━━━━━━\n`;
-        informe += `💰 **TOTAL A PAGAR: ${totalFinal} ${moneda}**\n`;
-        informe += `━━━━━━━━━━━━━━━━━━━━━\n`;
-        informe += `@K239`;
-
-        navigator.clipboard.writeText(informe).then(() => {
-            alert("✅ Informe detallado copiado al portapapeles.");
+        document.querySelectorAll('#lista-tropas .fila-dinamica').forEach(t => {
+            const qty = t.querySelector('.t-qty').value || 0;
+            const sel = t.querySelector('.t-tipo');
+            const nombre = sel.options[sel.selectedIndex].text;
+            const precio = parseInt(sel.value);
+            if(qty > 0) inf += `⚔️ ${nombre} x${parseInt(qty).toLocaleString()}: ${((qty*precio)/f).toLocaleString()} ${mon}\n`;
         });
+
+        document.querySelectorAll('.fort-lvl').forEach((fort, index) => {
+            const lvl = fort.value || 0;
+            if(lvl > 0) inf += `🛡️ Fortaleza ${index+1} (Lvl ${lvl}): ${((lvl*50000000)/f).toLocaleString()} ${mon}\n`;
+        });
+
+        const wall = parseInt(document.getElementById('wall-lvl').value)||0;
+        if(wall > 0) inf += `🧱 Muros (Lvl ${wall}): ${((wall*1000000)/f).toLocaleString()} ${mon}\n`;
+
+        const cap = parseInt(document.getElementById('cap-lvl').value)||0;
+        if(cap > 0) inf += `🏰 Capital (Lvl ${cap}): ${((cap*450000000)/f).toLocaleString()} ${mon}\n`;
+
+        if(document.getElementById('check-portal').checked) inf += `🌀 Portal Destruido: ${(5000000/f).toLocaleString()} ${mon}\n`;
+
+        inf += `━━━━━━━━━━━━━━━━━━━━━\n💰 **TOTAL FINAL: ${document.getElementById('total-final').innerText} ${mon}**\n━━━━━━━━━━━━━━━━━━━━━\n@K239`;
+
+        navigator.clipboard.writeText(inf).then(() => alert("✅ Informe detallado copiado."));
     }
 </script>
 </body>
