@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V36 - Report & Limits</title>
+    <title>K239 Calculator V37 - FINAL REPORT</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -12,9 +12,10 @@
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; transition: 0.3s; }
-        .btn-add:hover:not(:disabled) { background: #5da356; }
-        .btn-report { background: #8b5a2b; color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1.1em; }
-        .btn-report:hover { background: #a66d35; }
+        .btn-add:hover { background: #5da356; }
+        /* BOTÓN DE INFORME RESALTADO */
+        .btn-report { background: #d4af37; color: #1a110a; border: none; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1.2em; text-transform: uppercase; transition: 0.3s; }
+        .btn-report:hover { background: #f4e4bc; transform: scale(1.01); }
         .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
         input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
@@ -48,16 +49,17 @@
     <div class="grid-triple">
         <div class="caja-input"><label>Muros</label><input type="number" id="wall-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
         <div class="caja-input"><label>Capital (1-25)</label><input type="number" id="cap-lvl" min="1" max="25" value="1" oninput="validarRango(this)"></div>
-        <div class="caja-input"><label>Portal</label><div style="margin-top:5px;"><input type="checkbox" id="check-portal" onchange="calcular()"><span> Destruido</span></div></div>
+        <div class="caja-input"><label>Portal</label><div style="margin-top:5px;"><input type="checkbox" id="check-portal" onchange="calcular()"><span> Destruido (+5M)</span></div></div>
     </div>
 
     <div class="total-box">
         <span id="total-final">0</span>
-        <div style="margin-top:10px;">
+        <div style="margin-top:10px; margin-bottom: 20px;">
             <input type="radio" name="m" id="m-p" onchange="calcular()"> <label for="m-p">Plata</label>
             <input type="radio" name="m" id="m-o" checked onchange="calcular()"> <label for="m-o">Oro</label>
         </div>
-        <button class="btn-report" onclick="generarInforme()">📋 Generar Informe para Portapapeles</button>
+        <!-- AQUÍ ESTÁ EL BOTÓN -->
+        <button class="btn-report" onclick="generarInforme()">📋 Generar Informe @K239</button>
     </div>
 </div>
 
@@ -154,7 +156,7 @@
     }
 
     function calcular() {
-        let p = 5000000; // Multa
+        let p = 5000000; // MULTA FIJA
         document.querySelectorAll('.l-lvl').forEach(i => p += (parseInt(i.value)||0)*3000);
         document.querySelectorAll('.qty').forEach(i => {
             const sub = i.parentElement.querySelector('.sub-sel');
@@ -164,7 +166,6 @@
         p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
         p += (parseInt(document.getElementById('cap-lvl').value)||0)*450000000;
         if(document.getElementById('check-portal').checked) p += 5000000;
-
         const isO = document.getElementById('m-o').checked;
         document.getElementById('total-final').innerText = Math.round(isO ? p/3000 : p).toLocaleString();
     }
@@ -172,21 +173,23 @@
     function generarInforme() {
         const total = document.getElementById('total-final').innerText;
         const moneda = document.getElementById('m-o').checked ? "Oro" : "Plata";
+        const cap = document.getElementById('cap-lvl').value;
+        const forts = document.querySelectorAll('.fort-lvl').length;
+
         let informe = `📊 **INFORME DE COMPENSACIÓN K239**\n`;
-        informe += `----------------------------------\n`;
-        informe += `🔹 Multa Base: 5,000,000 Plata\n`;
-        informe += `🔹 Nivel Capital: ${document.getElementById('cap-lvl').value}\n`;
-        
-        const forts = document.querySelectorAll('.fort-lvl');
-        if(forts.length > 0) informe += `🔹 Fortalezas: ${forts.length}\n`;
-        
-        informe += `----------------------------------\n`;
+        informe += `━━━━━━━━━━━━━━━━━━━━━\n`;
+        informe += `⚠️ Multa de Ataque: 5,000,000 Plata\n`;
+        informe += `🏰 Capital Nivel: ${cap}\n`;
+        if(forts > 0) informe += `🛡️ Fortalezas: ${forts}\n`;
+        if(document.getElementById('check-portal').checked) informe += `🌀 Portal: Destruido (+5M)\n`;
+        informe += `━━━━━━━━━━━━━━━━━━━━━\n`;
         informe += `💰 **TOTAL A PAGAR: ${total} ${moneda}**\n`;
-        informe += `----------------------------------\n`;
+        informe += `━━━━━━━━━━━━━━━━━━━━━\n`;
         informe += `@K239`;
 
-        navigator.clipboard.writeText(informe);
-        alert("¡Informe copiado al portapapeles!");
+        navigator.clipboard.writeText(informe).then(() => {
+            alert("✅ Informe copiado con éxito. ¡Ya puedes pegarlo!");
+        });
     }
 </script>
 </body>
