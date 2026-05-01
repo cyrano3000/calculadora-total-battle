@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V31 - No Negative Values</title>
+    <title>K239 Calculator V33 - Specialists Corrected</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
         .lang-selector { text-align: right; margin-bottom: 20px; }
-        h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
+        h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        .multa-fija { text-align: center; color: #ff4d4d; font-weight: bold; margin-bottom: 20px; border: 1px dashed #ff4d4d; padding: 8px; border-radius: 5px; background: rgba(255,0,0,0.1); }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; transition: 0.3s; }
@@ -20,8 +21,6 @@
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
         .del-btn { color:red; background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.2em; padding: 0 10px; }
-        .rtl { direction: rtl; text-align: right; }
-        .rtl h3 { border-left: none; border-right: 5px solid #8b5a2b; padding-right: 15px; }
     </style>
 </head>
 <body onload="actualizarInterfaz()">
@@ -41,8 +40,9 @@
     </div>
 
     <h2 id="txt-titulo">K239 Calculator</h2>
+    <div class="multa-fija" id="txt-multa">Attack Fine: 5,000,000 Silver</div>
 
-    <h3 id="txt-sec1">1. Leaders</h3>
+    <h3 id="txt-sec1">1. Leaders (Max 1 Hero / 3 Captains)</h3>
     <div id="lista-lideres"></div>
     <button class="btn-add" id="btn-lider" onclick="nuevoLider()">+ Add Leader</button>
 
@@ -54,13 +54,15 @@
     <div id="lista-mercenarios"></div>
     <button class="btn-add" id="btn-add-mercenarios" onclick="nuevaFila('mercenarios')">+ Add Mercenary</button>
 
-    <h3 id="txt-sec4">4. Buildings</h3>
+    <h3 id="txt-sec4">4. Buildings & Others</h3>
+    <div id="lista-fortalezas"></div>
+    <button class="btn-add" id="btn-add-fort" onclick="nuevaFortaleza()">+ Add Fortress (Max 4)</button>
+    
     <div class="grid-triple">
         <div class="caja-input"><label id="lbl-wall">Walls</label><input type="number" id="wall-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
-        <div class="caja-input"><label id="lbl-fort">Fortress</label><input type="number" id="fort-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
-        <div class="caja-input"><label id="lbl-cap">Capital</label><input type="number" id="cap-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
+        <div class="caja-input"><label id="lbl-cap">Capital (Lvl 1-25)</label><input type="number" id="cap-lvl" min="1" max="25" value="1" oninput="validarCap(this)"></div>
+        <div class="caja-input"><label id="lbl-portal">Portal</label><div style="margin-top:5px;"><input type="checkbox" id="check-portal" onchange="calcular()"><span id="txt-port-check"> Destroyed (+5M)</span></div></div>
     </div>
-    <div style="margin-top:15px;"><input type="checkbox" id="check-portal" onchange="calcular()"><label id="lbl-portal" for="check-portal"> Portal Destroyed (+5M)</label></div>
 
     <div class="total-box">
         <span id="total-final">0</span>
@@ -73,19 +75,14 @@
 
 <script>
     const i18n = {
-        en: { tit: "K239 Compensation Calculator", s1: "1. Leaders (Max 4)", s2: "2. Barracks Troops", s3: "3. Temporary Mercenaries", s4: "4. Buildings & Others", bl: "+ Add Leader", bc: "+ Add Barracks Troop", bm: "+ Add Mercenary", lp: "Portal Destroyed (+5M)", lw: "Walls", lf: "Fortress", lc: "Capital", rp: "Silver", ro: "Gold", qty: "Qty", Mounted: "Mounted", Volador: "Flying", Melee: "Melee / Ranged", Scouts: "Scouts", Siege: "Siege", Guards: "Guards", Specialists: "Specialists", Monsters: "Monsters", Hero: "Hero", Captain: "Captain" },
-        es: { tit: "Calculadora de Compensación K239", s1: "1. Líderes (Máx 4)", s2: "2. Tropas de Cuartel", s3: "3. Mercenarios Temporales", s4: "4. Edificios y Otros", bl: "+ Añadir Líder", bc: "+ Añadir Tropa de Cuartel", bm: "+ Añadir Mercenario", lp: "Portal Destruido (+5M)", lw: "Muros", lf: "Fortaleza", lc: "Capital", rp: "Plata", ro: "Oro", qty: "Cant", Mounted: "Montadas", Volador: "Voladora", Melee: "Cuerpo a cuerpo / Distancia", Scouts: "Exploradores", Siege: "Asedio", Guards: "Guardias", Specialists: "Especialistas", Monsters: "Monstruos", Hero: "Héroe", Captain: "Capitán" },
-        fr: { tit: "Calculateur de Compensation K239", s1: "1. Chefs (Max 4)", s2: "2. Troupes de Caserne", s3: "3. Mercenaires Temporaires", s4: "4. Bâtiments", bl: "+ Ajouter Chef", bc: "+ Ajouter Troupe", bm: "+ Ajouter Mercenaire", lp: "Portail Détruit (+5M)", lw: "Murs", lf: "Forteresse", lc: "Capitale", rp: "Argent", ro: "Or", qty: "Qté", Mounted: "Monté", Volador: "Volant", Melee: "Mêlée / Portée", Scouts: "Éclaireurs", Siege: "Siège", Guards: "Gardes", Specialists: "Spécialistes", Monsters: "Monstres", Hero: "Héros", Captain: "Capitaine" },
-        it: { tit: "Calcolatore Compensazione K239", s1: "1. Leader (Max 4)", s2: "2. Truppe Caserma", s3: "3. Mercenari Temporanei", s4: "4. Edifici", bl: "+ Aggiungi Leader", bc: "+ Aggiungi Truppa", bm: "+ Aggiungi Mercenario", lp: "Portale Distrutto (+5M)", lw: "Mura", lf: "Fortezza", lc: "Capitale", rp: "Argento", ro: "Oro", qty: "Qtà", Mounted: "Montata", Volador: "Volante", Melee: "Mischia / Distanza", Scouts: "Esploratori", Siege: "Assedio", Guards: "Guardie", Specialists: "Specialisti", Monsters: "Mostri", Hero: "Eroe", Captain: "Capitano" },
-        de: { tit: "K239 Entschädigungsrechner", s1: "1. Anführer (Max 4)", s2: "2. Kasernentruppen", s3: "3. Temporäre Söldner", s4: "4. Gebäude", bl: "+ Anführer hinzufügen", bc: "+ Truppe hinzufügen", bm: "+ Söldner hinzufügen", lp: "Portal zerstört (+5M)", lw: "Wände", lf: "Festung", lc: "Hauptstadt", rp: "Silber", ro: "Gold", qty: "Menge", Mounted: "Beritten", Volador: "Fliegend", Melee: "Nahkampf / Fernkampf", Scouts: "Späher", Siege: "Belagerung", Guards: "Wachen", Specialists: "Spezialisten", Monsters: "Monster", Hero: "Held", Captain: "Hauptmann" },
-        pt: { tit: "Calculadora de Compensação K239", s1: "1. Líderes (Máx 4)", s2: "2. Tropas de Quartel", s3: "3. Mercenários Temporários", s4: "4. Edifícios", bl: "+ Adicionar Líder", bc: "+ Adicionar Tropa", bm: "+ Adicionar Mercenário", lp: "Portal Destruído (+5M)", lw: "Muralhas", lf: "Fortaleza", lc: "Capital", rp: "Prata", ro: "Ouro", qty: "Qtd", Mounted: "Montada", Volador: "Voadora", Melee: "Corpo a corpo / Distância", Scouts: "Exploradores", Siege: "Cerco", Guards: "Guardas", Specialists: "Especialistas", Monsters: "Monstros", Hero: "Herói", Captain: "Capitão" },
-        ru: { tit: "Калькулятор компенсации K239", s1: "1. Лидеры (Макс 4)", s2: "2. Войска казармы", s3: "3. Временные наемники", s4: "4. Здания", bl: "+ Добавить лидера", bc: "+ Добавить войска", bm: "+ Добавить наемника", lp: "Портал разрушен (+5M)", lw: "Стены", lf: "Крепость", lc: "Столица", rp: "Серебро", ro: "Золото", qty: "Кол-во", Mounted: "Конница", Volador: "Летающие", Melee: "Ближний / Дальний бой", Scouts: "Разведчики", Siege: "Осада", Guards: "Стражи", Specialists: "Специалисты", Monsters: "Монстры", Hero: "Герой", Captain: "Капитан" },
-        ar: { tit: "حاسبة تعويضات K239", s1: "1. القادة (الحد الأقصى 4)", s2: "2. قوات الثكنات", s3: "3. المرتزقة المؤقتون", s4: "4. المباني", bl: "+ إضافة قائد", bc: "+ إضافة قوات", bm: "+ إضافة مرتزق", lp: "البوابة مدمرة (+5M)", lw: "الجدران", lf: "الحصن", lc: "العاصمة", rp: "فضة", ro: "ذهب", qty: "الكمية", Mounted: "خيالة", Volador: "طيران", Melee: "اشتباك / بعيد", Scouts: "كشافة", Siege: "حصار", Guards: "حراس", Specialists: "متخصصون", Monsters: "وحوش", Hero: "بطل", Captain: "قائد" }
+        en: { tit: "K239 Compensation Calculator", fine: "Attack Fine: 5,000,000 Silver", s1: "1. Leaders (Max 4)", s2: "2. Barracks Troops", s3: "3. Temporary Mercenaries", s4: "4. Buildings & Others", bl: "+ Add Leader", bc: "+ Add Barracks Troop", bm: "+ Add Mercenary", bf: "+ Add Fortress (Max 4)", lp: "Portal Destroyed (+5M)", lw: "Walls", lc: "Capital (1-25)", rp: "Silver", ro: "Gold", qty: "Qty", Mounted: "Mounted", Volador: "Flying", Melee: "Melee / Ranged", Scouts: "Scouts", Siege: "Siege", Guards: "Guards", Specialists: "Specialists", Monsters: "Monsters", Hero: "Hero", Captain: "Captain", Fort: "Fortress" },
+        es: { tit: "Calculadora de Compensación K239", fine: "Multa de Ataque: 5,000,000 Plata", s1: "1. Líderes (Máx 4)", s2: "2. Tropas de Cuartel", s3: "3. Mercenarios Temporales", s4: "4. Edificios y Otros", bl: "+ Añadir Líder", bc: "+ Añadir Tropa de Cuartel", bm: "+ Añadir Mercenario", bf: "+ Añadir Fortaleza (Máx 4)", lp: "Portal Destruido (+5M)", lw: "Muros", lc: "Capital (1-25)", rp: "Plata", ro: "Oro", qty: "Cant", Mounted: "Montadas", Volador: "Voladora", Melee: "Cuerpo a cuerpo / Distancia", Scouts: "Exploradores", Siege: "Asedio", Guards: "Guardias", Specialists: "Especialistas", Monsters: "Monstruos", Hero: "Héroe", Captain: "Capitán", Fort: "Fortaleza" }
     };
 
+    // Especialistas de CUARTEL ahora incluyen Volador
     const dbCuartel = {
         "Guards": { "Mounted": 1250, "Volador": 12500, "Melee": 625 },
-        "Specialists": { "Mounted": 1400, "Melee": 700, "Scouts": 3500 },
+        "Specialists": { "Mounted": 1400, "Volador": 28000, "Melee": 700, "Scouts": 3500 },
         "Siege": { "Siege": 6250 },
         "Monsters": { "I": 29000, "II": 32000, "III": 4000, "IV": 8000, "V": 12000, "VI": 18000, "VII": 24000 }
     };
@@ -97,13 +94,18 @@
         "Monsters": { "Mounted": 5300, "Volador": 7600, "Melee": 5000 }
     };
 
+    function validarCap(input) {
+        let v = parseInt(input.value);
+        if (v > 25) input.value = 25;
+        if (v < 1) input.value = 1;
+        calcular();
+    }
+
     function actualizarInterfaz() {
         const lang = document.getElementById('select-idioma').value;
-        const t = i18n[lang];
-        const cont = document.getElementById('main-cont');
-        if(lang === 'ar') cont.classList.add('rtl'); else cont.classList.remove('rtl');
-
+        const t = i18n[lang] || i18n.en;
         document.getElementById('txt-titulo').innerText = t.tit;
+        document.getElementById('txt-multa').innerText = t.fine;
         document.getElementById('txt-sec1').innerText = t.s1;
         document.getElementById('txt-sec2').innerText = t.s2;
         document.getElementById('txt-sec3').innerText = t.s3;
@@ -111,45 +113,78 @@
         document.getElementById('btn-lider').innerText = t.bl;
         document.getElementById('btn-add-cuartel').innerText = t.bc;
         document.getElementById('btn-add-mercenarios').innerText = t.bm;
-        document.getElementById('lbl-portal').innerText = t.lp;
+        document.getElementById('btn-add-fort').innerText = t.bf;
+        document.getElementById('txt-port-check').innerText = t.lp;
         document.getElementById('lbl-wall').innerText = t.lw;
-        document.getElementById('lbl-fort').innerText = t.lf;
         document.getElementById('lbl-cap').innerText = t.lc;
         document.getElementById('lbl-p').innerText = t.rp;
         document.getElementById('lbl-o').innerText = t.ro;
-
-        document.querySelectorAll('.l-type').forEach(sel => {
-            const val = sel.value;
-            sel.options[0].text = t.Hero; sel.options[1].text = t.Captain;
-            sel.value = val;
-        });
-
-        document.querySelectorAll('.fila-tropa').forEach(fila => {
-            const catSel = fila.querySelector('.cat-sel');
-            catSel.options[1].text = t.Guards;
-            catSel.options[2].text = t.Specialists;
-            catSel.options[3].text = t.Siege;
-            catSel.options[4].text = t.Monsters;
-            if(catSel.value) updateSub(catSel, fila.dataset.tipo, fila.querySelector('.sub-sel').value);
-        });
         calcular();
+    }
+
+    function nuevoLider() {
+        if (document.querySelectorAll('.l-type').length >= 4) return;
+        const lang = document.getElementById('select-idioma').value;
+        const t = i18n[lang] || i18n.en;
+        
+        const hasHero = Array.from(document.querySelectorAll('.l-type')).some(s => s.value === 'h');
+        const defaultType = hasHero ? 'c' : 'h';
+
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        div.innerHTML = `
+            <select class="l-type" onchange="validarHéroeÚnico(this)">
+                <option value="h" ${defaultType === 'h' ? 'selected' : ''}>${t.Hero}</option>
+                <option value="c" ${defaultType === 'c' ? 'selected' : ''}>${t.Captain}</option>
+            </select>
+            <input type="number" class="l-lvl" min="0" value="1" oninput="calcular()">
+            <button onclick="this.parentElement.remove(); checkButtons();" class="del-btn">✖</button>`;
+        document.getElementById('lista-lideres').appendChild(div);
+        checkButtons();
+    }
+
+    function validarHéroeÚnico(selectActual) {
+        const selects = document.querySelectorAll('.l-type');
+        let heroCount = 0;
+        selects.forEach(s => { if(s.value === 'h') heroCount++; });
+
+        if (heroCount > 1) {
+            alert("Solo se permite 1 Héroe.");
+            selectActual.value = 'c';
+        }
+        calcular();
+    }
+
+    function nuevaFortaleza() {
+        if (document.querySelectorAll('.fort-lvl').length >= 4) return;
+        const lang = document.getElementById('select-idioma').value;
+        const t = i18n[lang] || i18n.en;
+        const div = document.createElement('div');
+        div.className = 'fila-dinamica';
+        div.innerHTML = `
+            <span style="flex-grow:1">${t.Fort}</span>
+            <input type="number" class="fort-lvl" min="0" placeholder="Lvl" style="width:100px" oninput="calcular()">
+            <button onclick="this.parentElement.remove(); checkButtons();" class="del-btn">✖</button>`;
+        document.getElementById('lista-fortalezas').appendChild(div);
+        checkButtons();
     }
 
     function nuevaFila(tipo) {
         const lang = document.getElementById('select-idioma').value;
+        const t = i18n[lang] || i18n.en;
         const div = document.createElement('div');
         div.className = 'fila-dinamica fila-tropa';
         div.dataset.tipo = tipo;
         div.innerHTML = `
             <select class="cat-sel" onchange="updateSub(this, '${tipo}')">
                 <option value="">Cat</option>
-                <option value="Guards">${i18n[lang].Guards}</option>
-                <option value="Specialists">${i18n[lang].Specialists}</option>
-                <option value="Siege">${i18n[lang].Siege}</option>
-                <option value="Monsters">${i18n[lang].Monsters}</option>
+                <option value="Guards">${t.Guards}</option>
+                <option value="Specialists">${t.Specialists}</option>
+                <option value="Siege">${t.Siege}</option>
+                <option value="Monsters">${t.Monsters}</option>
             </select>
             <select class="sub-sel" style="display:none" onchange="calcular()"></select>
-            <input type="number" class="qty" min="0" placeholder="${i18n[lang].qty}" oninput="calcular()">
+            <input type="number" class="qty" min="0" placeholder="${t.qty}" oninput="calcular()">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-' + tipo).appendChild(div);
     }
@@ -157,11 +192,12 @@
     function updateSub(sel, tipo, valorPrevio = null) {
         const db = tipo === 'cuartel' ? dbCuartel : dbMercenarios;
         const lang = document.getElementById('select-idioma').value;
+        const t = i18n[lang] || i18n.en;
         const sub = sel.parentElement.querySelector('.sub-sel');
         const cat = sel.value;
         if(cat) {
             sub.innerHTML = Object.entries(db[cat]).map(([k, v]) => {
-                const label = (cat === 'Monsters' && tipo === 'cuartel') ? `Lvl ${k}` : (i18n[lang][k] || k);
+                const label = (cat === 'Monsters' && tipo === 'cuartel') ? `Lvl ${k}` : (t[k] || k);
                 return `<option value="${v}" ${v == valorPrevio ? 'selected' : ''}>${label} (${v.toLocaleString()})</option>`;
             }).join('');
             sub.style.display = 'block';
@@ -169,44 +205,24 @@
         calcular();
     }
 
-    function nuevoLider() {
-        if (document.querySelectorAll('.l-type').length >= 4) return;
-        const lang = document.getElementById('select-idioma').value;
-        const div = document.createElement('div');
-        div.className = 'fila-dinamica';
-        div.innerHTML = `<select class="l-type" onchange="vL(this)"><option value="h">${i18n[lang].Hero}</option><option value="c">${i18n[lang].Captain}</option></select>
-        <input type="number" class="l-lvl" min="0" value="1" oninput="calcular()"><button onclick="this.parentElement.remove(); checkL();" class="del-btn">✖</button>`;
-        document.getElementById('lista-lideres').appendChild(div);
-        vL(div.querySelector('select'));
-    }
-
-    function vL(s) {
-        let h = 0, c = 0;
-        document.querySelectorAll('.l-type').forEach(sel => { if(sel.value==='h') h++; else c++; });
-        if(h > 1) s.value = 'c'; else if(c > 3) s.value = 'h';
-        checkL();
-    }
-
-    function checkL() {
+    function checkButtons() {
         document.getElementById('btn-lider').disabled = (document.querySelectorAll('.l-type').length >= 4);
+        document.getElementById('btn-add-fort').disabled = (document.querySelectorAll('.fort-lvl').length >= 4);
         calcular();
     }
 
     function calcular() {
-        let p = 5000000;
-        // Leaders: min 0 protection
+        let p = 5000000; // Multa Base Fija
         document.querySelectorAll('.l-lvl').forEach(i => p += Math.max(0, (parseInt(i.value)||0))*3000);
-        // Troops/Mercenaries: min 0 protection
         document.querySelectorAll('.qty').forEach(i => {
             const sub = i.parentElement.querySelector('.sub-sel');
             if(sub && sub.style.display !== 'none') p += Math.max(0, (parseInt(i.value)||0)) * (parseInt(sub.value)||0);
         });
-        // Buildings: min 0 protection
+        document.querySelectorAll('.fort-lvl').forEach(i => p += Math.max(0, (parseInt(i.value)||0))*50000000);
         p += Math.max(0, (parseInt(document.getElementById('wall-lvl').value)||0))*1000000;
-        p += Math.max(0, (parseInt(document.getElementById('fort-lvl').value)||0))*50000000;
         p += Math.max(0, (parseInt(document.getElementById('cap-lvl').value)||0))*450000000;
-        
         if(document.getElementById('check-portal').checked) p += 5000000;
+
         const isO = document.getElementById('m-o').checked;
         document.getElementById('total-final').innerText = Math.round(isO ? p/3000 : p).toLocaleString();
     }
