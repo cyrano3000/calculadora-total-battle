@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V39 - Final Fix</title>
+    <title>K239 Calculator V40 - Detailed Report</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -47,11 +47,7 @@
     
     <div class="grid-triple">
         <div class="caja-input"><label>Muros</label><input type="number" id="wall-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
-        <div class="caja-input">
-            <label>Capital (1-25)</label>
-            <!-- Eliminado el value="1" para que empiece vacío -->
-            <input type="number" id="cap-lvl" min="0" max="25" placeholder="Nivel" oninput="validarSimple(this)">
-        </div>
+        <div class="caja-input"><label>Capital (1-25)</label><input type="number" id="cap-lvl" min="0" max="25" placeholder="Nivel" oninput="validarSimple(this)"></div>
         <div class="caja-input"><label>Portal</label><div style="margin-top:5px;"><input type="checkbox" id="check-portal" onchange="calcular()"><span> Destruido (+5M)</span></div></div>
     </div>
 
@@ -61,7 +57,7 @@
             <input type="radio" name="m" id="m-p" onchange="calcular()"> <label for="m-p">Plata</label>
             <input type="radio" name="m" id="m-o" checked onchange="calcular()"> <label for="m-o">Oro</label>
         </div>
-        <button class="btn-report" onclick="generarInforme()">📋 Generar Informe @K239</button>
+        <button class="btn-report" onclick="generarInforme()">📋 Generar Informe Detallado @K239</button>
     </div>
 </div>
 
@@ -80,7 +76,6 @@
         "Monsters": { "Montadas": 5300, "Voladora": 7600, "Cuerpo a cuerpo": 5000 }
     };
 
-    // Nueva validación que permite borrar el número completamente
     function validarSimple(input) {
         let v = input.value;
         if (v !== "" && parseInt(v) > 25) input.value = 25;
@@ -167,36 +162,54 @@
         });
         document.querySelectorAll('.fort-lvl').forEach(i => p += (parseInt(i.value)||0)*50000000);
         p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
-        
         const capVal = parseInt(document.getElementById('cap-lvl').value)||0;
-        if(capVal > 0) {
-            p += capVal * 450000000;
-        }
-
+        if(capVal > 0) p += capVal * 450000000;
         if(document.getElementById('check-portal').checked) p += 5000000;
         const isO = document.getElementById('m-o').checked;
         document.getElementById('total-final').innerText = Math.round(isO ? p/3000 : p).toLocaleString();
     }
 
     function generarInforme() {
-        const total = document.getElementById('total-final').innerText;
-        const moneda = document.getElementById('m-o').checked ? "Oro" : "Plata";
-        const cap = parseInt(document.getElementById('cap-lvl').value)||0;
-        const forts = document.querySelectorAll('.fort-lvl').length;
+        const isOro = document.getElementById('m-o').checked;
+        const factor = isOro ? 3000 : 1;
+        const moneda = isOro ? "Oro" : "Plata";
+        
+        let subLideres = 0;
+        document.querySelectorAll('.l-lvl').forEach(i => subLideres += (parseInt(i.value)||0)*3000);
+        
+        let subTropas = 0;
+        document.querySelectorAll('.qty').forEach(i => {
+            const sub = i.parentElement.querySelector('.sub-sel');
+            if(sub && sub.style.display !== 'none') subTropas += (parseInt(i.value)||0) * (parseInt(sub.value)||0);
+        });
 
-        let informe = `📊 **INFORME DE COMPENSACIÓN K239**\n`;
+        let subForts = 0;
+        document.querySelectorAll('.fort-lvl').forEach(i => subForts += (parseInt(i.value)||0)*50000000);
+        
+        const subMuros = (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
+        const capLvl = parseInt(document.getElementById('cap-lvl').value)||0;
+        const subCap = capLvl * 450000000;
+        const subPortal = document.getElementById('check-portal').checked ? 5000000 : 0;
+        const totalFinal = document.getElementById('total-final').innerText;
+
+        let informe = `📊 **INFORME DETALLADO K239**\n`;
         informe += `━━━━━━━━━━━━━━━━━━━━━\n`;
-        informe += `⚠️ Multa de Ataque: 5,000,000 Plata\n`;
-        if(cap > 0) informe += `🏰 Capital Nivel: ${cap}\n`;
-        if(forts > 0) informe += `🛡️ Fortalezas: ${forts}\n`;
-        if(document.getElementById('check-portal').checked) informe += `🌀 Portal: Destruido (+5M)\n`;
+        informe += `🔸 Multa Base: 5,000,000 Plata\n`;
+        
+        if(subLideres > 0) informe += `🔸 Líderes/Capitanes: ${(subLideres/factor).toLocaleString()} ${moneda}\n`;
+        if(subTropas > 0) informe += `🔸 Tropas/Mercenarios: ${(subTropas/factor).toLocaleString()} ${moneda}\n`;
+        if(subForts > 0) informe += `🔸 Fortalezas: ${(subForts/factor).toLocaleString()} ${moneda}\n`;
+        if(subMuros > 0) informe += `🔸 Daños en Muros: ${(subMuros/factor).toLocaleString()} ${moneda}\n`;
+        if(subCap > 0) informe += `🔸 Capital (Lvl ${capLvl}): ${(subCap/factor).toLocaleString()} ${moneda}\n`;
+        if(subPortal > 0) informe += `🔸 Portal Destruido: ${(subPortal/factor).toLocaleString()} ${moneda}\n`;
+        
         informe += `━━━━━━━━━━━━━━━━━━━━━\n`;
-        informe += `💰 **TOTAL A PAGAR: ${total} ${moneda}**\n`;
+        informe += `💰 **TOTAL A PAGAR: ${totalFinal} ${moneda}**\n`;
         informe += `━━━━━━━━━━━━━━━━━━━━━\n`;
         informe += `@K239`;
 
         navigator.clipboard.writeText(informe).then(() => {
-            alert("✅ Informe copiado con éxito.");
+            alert("✅ Informe detallado copiado al portapapeles.");
         });
     }
 </script>
