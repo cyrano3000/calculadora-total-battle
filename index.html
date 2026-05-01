@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V38 - Capital Flexible</title>
+    <title>K239 Calculator V39 - Final Fix</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
@@ -47,8 +47,11 @@
     
     <div class="grid-triple">
         <div class="caja-input"><label>Muros</label><input type="number" id="wall-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
-        <!-- CAPITAL AHORA EMPIEZA EN 0 -->
-        <div class="caja-input"><label>Capital (1-25)</label><input type="number" id="cap-lvl" min="0" max="25" value="0" placeholder="0" oninput="validarCap(this)"></div>
+        <div class="caja-input">
+            <label>Capital (1-25)</label>
+            <!-- Eliminado el value="1" para que empiece vacío -->
+            <input type="number" id="cap-lvl" min="0" max="25" placeholder="Nivel" oninput="validarSimple(this)">
+        </div>
         <div class="caja-input"><label>Portal</label><div style="margin-top:5px;"><input type="checkbox" id="check-portal" onchange="calcular()"><span> Destruido (+5M)</span></div></div>
     </div>
 
@@ -77,17 +80,11 @@
         "Monsters": { "Montadas": 5300, "Voladora": 7600, "Cuerpo a cuerpo": 5000 }
     };
 
-    function validarCap(input) {
-        let v = parseInt(input.value);
-        if (v > 25) input.value = 25;
-        if (v < 0) input.value = 0;
-        calcular();
-    }
-
-    function validarFort(input) {
-        let v = parseInt(input.value);
-        if (v > 25) input.value = 25;
-        if (v < 1) input.value = 1;
+    // Nueva validación que permite borrar el número completamente
+    function validarSimple(input) {
+        let v = input.value;
+        if (v !== "" && parseInt(v) > 25) input.value = 25;
+        if (v !== "" && parseInt(v) < 0) input.value = 0;
         calcular();
     }
 
@@ -122,7 +119,7 @@
         div.className = 'fila-dinamica';
         div.innerHTML = `
             <span style="flex-grow:1">Fortaleza</span>
-            <input type="number" class="fort-lvl" min="1" max="25" value="1" style="width:100px" oninput="validarFort(this)">
+            <input type="number" class="fort-lvl" min="0" max="25" placeholder="Lvl" style="width:100px" oninput="validarSimple(this)">
             <button onclick="this.parentElement.remove(); checkButtons();" class="del-btn">✖</button>`;
         document.getElementById('lista-fortalezas').appendChild(div);
         checkButtons();
@@ -162,7 +159,7 @@
     }
 
     function calcular() {
-        let p = 5000000; // Multa Fija
+        let p = 5000000; 
         document.querySelectorAll('.l-lvl').forEach(i => p += (parseInt(i.value)||0)*3000);
         document.querySelectorAll('.qty').forEach(i => {
             const sub = i.parentElement.querySelector('.sub-sel');
@@ -171,7 +168,6 @@
         document.querySelectorAll('.fort-lvl').forEach(i => p += (parseInt(i.value)||0)*50000000);
         p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
         
-        // Lógica de Capital: Solo suma si es mayor a 0
         const capVal = parseInt(document.getElementById('cap-lvl').value)||0;
         if(capVal > 0) {
             p += capVal * 450000000;
