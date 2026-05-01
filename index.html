@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V54 - Full Multi-Lang</title>
+    <title>K239 Calculator V56 - Monster Update</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); position: relative; }
@@ -50,9 +50,9 @@
     <div id="lista-lideres"></div>
     <button class="btn-add" onclick="nuevoLider()" id="btn-add-lider">+ Añadir Líder</button>
 
-    <h3 id="txt-sec2">2. Tropas de Cuartel</h3>
+    <h3 id="txt-sec2">2. Mercenarios de Cuartel (Monstruos)</h3>
     <div id="lista-cuartel"></div>
-    <button class="btn-add" onclick="nuevaFila('Cuartel')" id="btn-add-cuartel">+ Añadir Tropa de Cuartel</button>
+    <button class="btn-add" onclick="nuevaFila('Cuartel')" id="btn-add-cuartel">+ Añadir Mercenario de Cuartel</button>
 
     <h3 id="txt-sec3">3. Mercenarios Temporales</h3>
     <div id="lista-mercenarios"></div>
@@ -82,22 +82,23 @@
     let currentLang = 'es';
 
     const translations = {
-        es: { titulo: "Calculadora K239", alerta: "⚠️ Multa de Ataque: 5,000,000 Plata (Fija)", sec1: "1. Líderes", sec2: "2. Tropas de Cuartel", sec3: "3. Mercenarios Temporales", sec4: "4. Edificios y Otros", addLider: "+ Añadir Líder", addCuartel: "+ Añadir Tropa de Cuartel", addMerc: "+ Añadir Mercenario Temporal", addFort: "+ Añadir Fortaleza (Máx 4)", wall: "Muros", cap: "Capital (1-25)", portal: "Portal", destruido: " Destruido", plata: "Plata", oro: "Oro", report: "📋 Copiar Informe Detallado @K239", hero: "Héroe", captain: "Capitán", fortTxt: "Fortaleza", alertCopy: "✅ Informe detallado copiado.", baseFine: "Multa Base", totalTxt: "TOTAL FINAL" },
-        en: { titulo: "K239 Calculator", alerta: "⚠️ Attack Fine: 5,000,000 Silver (Fixed)", sec1: "1. Leaders", sec2: "2. Barracks Troops", sec3: "3. Temporary Mercenaries", sec4: "4. Buildings & Others", addLider: "+ Add Leader", addCuartel: "+ Add Barracks Troop", addMerc: "+ Add Temp Mercenary", addFort: "+ Add Fortress (Max 4)", wall: "Walls", cap: "Capital (1-25)", portal: "Portal", destruido: " Destroyed", plata: "Silver", oro: "Gold", report: "📋 Copy Detailed Report @K239", hero: "Hero", captain: "Captain", fortTxt: "Fortress", alertCopy: "✅ Detailed report copied.", baseFine: "Base Fine", totalTxt: "FINAL TOTAL" },
-        fr: { titulo: "Calculatrice K239", alerta: "⚠️ Amende d'attaque: 5,000,000 Argent (Fixe)", sec1: "1. Leaders", sec2: "2. Troupes de Caserne", sec3: "3. Mercenaires Temporaires", sec4: "4. Bâtiments et Autres", addLider: "+ Ajouter un Leader", addCuartel: "+ Ajouter Troupe Caserne", addMerc: "+ Ajouter Mercenaire", addFort: "+ Ajouter Forteresse (Max 4)", wall: "Murs", cap: "Capitale (1-25)", portal: "Portail", destruido: " Détruit", plata: "Argent", oro: "Or", report: "📋 Copier le rapport détaillé @K239", hero: "Héros", captain: "Capitaine", fortTxt: "Forteresse", alertCopy: "✅ Rapport détaillé copié.", baseFine: "Amende de Base", totalTxt: "TOTAL FINAL" },
-        de: { titulo: "K239 Rechner", alerta: "⚠️ Angriff Strafe: 5,000,000 Silber (Fest)", sec1: "1. Anführer", sec2: "2. Kasernentruppen", sec3: "3. Temporäre Söldner", sec4: "4. Gebäude & Sonstiges", addLider: "+ Anführer hinzufügen", addCuartel: "+ Kasernentruppe hinzufügen", addMerc: "+ Söldner hinzufügen", addFort: "+ Festung hinzufügen (Max 4)", wall: "Mauern", cap: "Hauptstadt (1-25)", portal: "Portal", destruido: " Zerstört", plata: "Silber", oro: "Gold", report: "📋 Detaillierten Bericht kopieren @K239", hero: "Held", captain: "Kapitän", fortTxt: "Festung", alertCopy: "✅ Bericht kopiert.", baseFine: "Grundgebühr", totalTxt: "GESAMTSUMME" },
-        ru: { titulo: "Калькулятор K239", alerta: "⚠️ Штраф за атаку: 5,000,000 Серебра", sec1: "1. Лидеры", sec2: "2. Войска казармы", sec3: "3. Временные наемники", sec4: "4. Здания и прочее", addLider: "+ Добавить лидера", addCuartel: "+ Добавить войска", addMerc: "+ Добавить наемника", addFort: "+ Добавить крепость (макс. 4)", wall: "Стены", cap: "Столица (1-25)", portal: "Портал", destruido: " Разрушен", plata: "Серебро", oro: "Золото", report: "📋 Копировать отчет @K239", hero: "Герой", captain: "Капитан", fortTxt: "Крепость", alertCopy: "✅ Отчет скопирован.", baseFine: "Базовый штраф", totalTxt: "ИТОГО" },
-        ar: { titulo: "حاسبة K239", alerta: "⚠️ غرامة الهجوم: 5,000,000 فضة (ثابتة)", sec1: "1. القادة", sec2: "2. قوات الثكنات", sec3: "3. المرتزقة المؤقتون", sec4: "4. المباني وغيرها", addLider: "+ إضافة قائد", addCuartel: "+ إضافة قوات ثكنات", addMerc: "+ إضافة مرتزق", addFort: "+ إضافة حصن (بحد أقصى 4)", wall: "الأسوار", cap: "العاصمة (1-25)", portal: "البوابة", destruido: " مدمرة", plata: "فضة", oro: "ذهب", report: "📋 نسخ تقرير مفصل @K239", hero: "بطل", captain: "قائد", fortTxt: "حصن", alertCopy: "✅ تم نسخ التقرير المفصل.", baseFine: "الغرامة الأساسية", totalTxt: "المجموع النهائي" }
+        es: { titulo: "Calculadora K239", alerta: "⚠️ Multa de Ataque: 5,000,000 Plata (Fija)", sec1: "1. Líderes", sec2: "2. Mercenarios de Cuartel", sec3: "3. Mercenarios Temporales", sec4: "4. Edificios y Otros", addLider: "+ Añadir Líder", addCuartel: "+ Añadir Mercenario de Cuartel", addMerc: "+ Añadir Mercenario Temporal", addFort: "+ Añadir Fortaleza (Máx 4)", wall: "Muros", cap: "Capital (1-25)", portal: "Portal", destruido: " Destruido", plata: "Plata", oro: "Oro", report: "📋 Copiar Informe Detallado @K239", hero: "Héroe", captain: "Capitán", fortTxt: "Fortaleza", alertCopy: "✅ Informe detallado copiado.", baseFine: "Multa Base", totalTxt: "TOTAL FINAL", monster: "Monstruo" },
+        en: { titulo: "K239 Calculator", alerta: "⚠️ Attack Fine: 5,000,000 Silver (Fixed)", sec1: "1. Leaders", sec2: "2. Barracks Mercenaries", sec3: "3. Temporary Mercenaries", sec4: "4. Buildings & Others", addLider: "+ Add Leader", addCuartel: "+ Add Barracks Mercenary", addMerc: "+ Add Temp Mercenary", addFort: "+ Add Fortress (Max 4)", wall: "Walls", cap: "Capital (1-25)", portal: "Portal", destruido: " Destroyed", plata: "Silver", oro: "Gold", report: "📋 Copy Detailed Report @K239", hero: "Hero", captain: "Captain", fortTxt: "Fortress", alertCopy: "✅ Detailed report copied.", baseFine: "Base Fine", totalTxt: "FINAL TOTAL", monster: "Monster" },
+        fr: { titulo: "Calculatrice K239", alerta: "⚠️ Amende d'attaque: 5,000,000 Argent (Fixe)", sec1: "1. Leaders", sec2: "2. Mercenaires de Caserne", sec3: "3. Mercenaires Temporaires", sec4: "4. Bâtiments et Autres", addLider: "+ Ajouter un Leader", addCuartel: "+ Ajouter Mercenaire Caserne", addMerc: "+ Ajouter Mercenaire", addFort: "+ Ajouter Forteresse (Max 4)", wall: "Murs", cap: "Capitale (1-25)", portal: "Portail", destruido: " Détruit", plata: "Argent", oro: "Or", report: "📋 Copier le rapport détaillé @K239", hero: "Héros", captain: "Capitaine", fortTxt: "Forteresse", alertCopy: "✅ Rapport détaillé copié.", baseFine: "Amende de Base", totalTxt: "TOTAL FINAL", monster: "Monstre" },
+        de: { titulo: "K239 Rechner", alerta: "⚠️ Angriff Strafe: 5,000,000 Silber (Fest)", sec1: "1. Anführer", sec2: "2. Kasernensöldner", sec3: "3. Temporäre Söldner", sec4: "4. Gebäude & Sonstiges", addLider: "+ Anführer hinzufügen", addCuartel: "+ Kasernensöldner hinzufügen", addMerc: "+ Söldner hinzufügen", addFort: "+ Festung hinzufügen (Max 4)", wall: "Mauern", cap: "Hauptstadt (1-25)", portal: "Portal", destruido: " Zerstört", plata: "Silber", oro: "Gold", report: "📋 Detaillierten Bericht kopieren @K239", hero: "Held", captain: "Kapitän", fortTxt: "Festung", alertCopy: "✅ Bericht kopiert.", baseFine: "Grundgebühr", totalTxt: "GESAMTSUMME", monster: "Monster" },
+        ru: { titulo: "Калькулятор K239", alerta: "⚠️ Штраф за атаку: 5,000,000 Серебра", sec1: "1. Лидеры", sec2: "2. Наемники казармы", sec3: "3. Временные наемники", sec4: "4. Здания и прочее", addLider: "+ Добавить лидера", addCuartel: "+ Добавить наемника", addMerc: "+ Добавить наемника", addFort: "+ Добавить крепость (макс. 4)", wall: "Стены", cap: "Столица (1-25)", portal: "Портал", destruido: " Разрушен", plata: "Серебро", oro: "Золото", report: "📋 Копировать отчет @K239", hero: "Герой", captain: "Капитан", fortTxt: "Крепость", alertCopy: "✅ Отчет скопирован.", baseFine: "Базовый штраф", totalTxt: "ИТОГО", monster: "Монстр" },
+        ar: { titulo: "حاسبة K239", alerta: "⚠️ غرامة الهجوم: 5,000,000 فضة (ثابتة)", sec1: "1. القادة", sec2: "2. مرتزقة الثكنات", sec3: "3. المرتزقة المؤقتون", sec4: "4. المباني وغيرها", addLider: "+ إضافة قائد", addCuartel: "+ إضافة مرتزق ثكنات", addMerc: "+ إضافة مرتزق", addFort: "+ إضافة حصن (بحد أقصى 4)", wall: "الأسوار", cap: "العاصمة (1-25)", portal: "البوابة", destruido: " مدمرة", plata: "فضة", oro: "ذهب", report: "📋 نسخ تقرير مفصل @K239", hero: "بطل", captain: "قائد", fortTxt: "حصن", alertCopy: "✅ تم نسخ التقرير المفصل.", baseFine: "الغرامة الأساسية", totalTxt: "المجموع النهائي", monster: "وحش" }
     };
 
     const dbPrecios = {
         "Cuartel": [
-            { es: "Guardia Montada", en: "Mounted Guard", fr: "Garde Montée", de: "Berittene Wache", ru: "Всадник", ar: "حرس خيالة", p: 1250 },
-            { es: "Guardia Voladora", en: "Flying Guard", fr: "Garde Volante", de: "Fliegende Wache", ru: "Летающий страж", ar: "حرس طائر", p: 12500 },
-            { es: "Guardia C.C. / Distancia", en: "Melee / Ranged Guard", fr: "Garde Mêlée / Portée", de: "Nah / Fernkampf Wache", ru: "Ближний / Дальний бой", ar: "حرس مشاة / رماة", p: 625 },
-            { es: "Espec. Montada", en: "Spec. Mounted", fr: "Spéc. Montée", de: "Spez. Berittene", ru: "Спец. Всадник", ar: "خيال خاص", p: 1400 },
-            { es: "Espec. Voladora", en: "Spec. Flying", fr: "Spéc. Volante", de: "Spez. Fliegende", ru: "Спец. Летающий", ar: "طائر خاص", p: 28000 },
-            { es: "Espec. C.C. / Distancia", en: "Spec. Melee / Ranged", fr: "Spéc. Mêlée / Portée", de: "Spez. Nah / Fern", ru: "Спец. Ближний/Дальний", ar: "مشاة/رماة خاص", p: 700 }
+            { es: "Monstruo III", en: "Monster III", p: 1250 },
+            { es: "Monstruo IV", en: "Monster IV", p: 12500 },
+            { es: "Monstruo V", en: "Monster V", p: 625 },
+            { es: "Monstruo VI", en: "Monster VI", p: 1400 },
+            { es: "Monstruo VII", en: "Monster VII", p: 28000 },
+            { es: "Monstruo I", en: "Monster I", p: 700 },
+            { es: "Monstruo II", en: "Monster II", p: 1400 }
         ],
         "Mercenario": [
             { es: "Merc. Montada", en: "Merc. Mounted", fr: "Merc. Monté", de: "Söldn. Beritten", ru: "Наем. Всадник", ar: "مرتزق خيال", p: 2500 },
@@ -152,7 +153,10 @@
             const cat = s.getAttribute('data-cat');
             let opts = "";
             dbPrecios[cat].forEach(item => {
-                opts += `<option value="${item.p}" ${val==item.p?'selected':''}>${item[currentLang]} (${item.p.toLocaleString()})</option>`;
+                let label = item[currentLang] || item.es;
+                // Si es monstruo, traducir palabra "Monstruo"
+                if(label.includes("Monstruo")) label = label.replace("Monstruo", t.monster);
+                opts += `<option value="${item.p}" ${val==item.p?'selected':''}>${label} (${item.p.toLocaleString()})</option>`;
             });
             s.innerHTML = opts;
         });
@@ -179,8 +183,11 @@
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
         let options = "";
+        const t = translations[currentLang];
         dbPrecios[tipo].forEach(item => {
-            options += `<option value="${item.p}">${item[currentLang]} (${item.p.toLocaleString()})</option>`;
+            let label = item[currentLang] || item.es;
+            if(label.includes("Monstruo")) label = label.replace("Monstruo", t.monster);
+            options += `<option value="${item.p}">${label} (${item.p.toLocaleString()})</option>`;
         });
         div.innerHTML = `<select class="t-tipo" data-cat="${tipo}" onchange="calcular()">${options}</select>
             <input type="number" class="t-qty" placeholder="Cantidad" min="0" onkeydown="filtroTeclas(event)" oninput="soloPositivos(this)">
@@ -210,10 +217,45 @@
     }
 
     function generarInforme() {
-        const isO = document.getElementById('m-o').checked;
-        const mon = isO ? translations[currentLang].oro : translations[currentLang].plata;
-        const txt = `📊 **INFORME K239**\n💰 TOTAL: ${document.getElementById('total-final').innerText} ${mon}\n(Copiado al portapapeles)`;
-        navigator.clipboard.writeText(txt).then(() => alert(translations[currentLang].alertCopy));
+        const isOro = document.getElementById('m-o').checked;
+        const f = isOro ? 3000 : 1;
+        const mon = isOro ? translations[currentLang].oro : translations[currentLang].plata;
+        const t = translations[currentLang];
+        
+        let inf = `📊 **${t.titulo}**\n━━━━━━━━━━━━━━━━━━━━━\n`;
+        inf += `✅ ${t.baseFine}: ${(5000000/f).toLocaleString()} ${mon}\n`;
+
+        document.querySelectorAll('#lista-lideres .fila-dinamica').forEach(l => {
+            const type = l.querySelector('.l-type').value;
+            const lvl = Math.max(0, l.querySelector('.l-lvl').value || 0);
+            const typeTxt = type === 'Héroe' ? t.hero : t.captain;
+            inf += `👤 ${typeTxt} (Lvl ${lvl}): ${((lvl*3000)/f).toLocaleString()} ${mon}\n`;
+        });
+
+        document.querySelectorAll('.t-qty').forEach(q => {
+            const qty = Math.max(0, q.value || 0);
+            const sel = q.parentElement.querySelector('.t-tipo');
+            const name = sel.options[sel.selectedIndex].text.split(' (')[0];
+            const price = parseInt(sel.value);
+            if(qty > 0) inf += `⚔️ ${name} x${parseInt(qty).toLocaleString()}: ${((qty*price)/f).toLocaleString()} ${mon}\n`;
+        });
+
+        document.querySelectorAll('.fort-lvl').forEach((fort, index) => {
+            const lvl = Math.max(0, fort.value || 0);
+            if(lvl > 0) inf += `🛡️ ${t.fortTxt} ${index+1} (Lvl ${lvl}): ${((lvl*50000000)/f).toLocaleString()} ${mon}\n`;
+        });
+
+        const wall = Math.max(0, parseInt(document.getElementById('wall-lvl').value)||0);
+        if(wall > 0) inf += `🧱 ${t.wall} (Lvl ${wall}): ${((wall*1000000)/f).toLocaleString()} ${mon}\n`;
+
+        const cap = Math.max(0, parseInt(document.getElementById('cap-lvl').value)||0);
+        if(cap > 0) inf += `🏰 ${t.cap.split(' (')[0]} (Lvl ${cap}): ${((cap*450000000)/f).toLocaleString()} ${mon}\n`;
+
+        if(document.getElementById('check-portal').checked) inf += `🌀 ${t.portal}${t.destruido}: ${(5000000/f).toLocaleString()} ${mon}\n`;
+
+        inf += `━━━━━━━━━━━━━━━━━━━━━\n💰 **${t.totalTxt}: ${document.getElementById('total-final').innerText} ${mon}**\n━━━━━━━━━━━━━━━━━━━━━\n@K239`;
+
+        navigator.clipboard.writeText(inf).then(() => alert(t.alertCopy));
     }
 </script>
 </body>
