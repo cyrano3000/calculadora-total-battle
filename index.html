@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V42 - Final Units</title>
+    <title>K239 Calculator V43 - Secciones Separadas</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
         h2 { color: #d4af37; text-align: center; border-bottom: 2px solid #8b5a2b; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-        .alerta-multa { background: #4a0f0f; color: #ffcccc; border: 2px solid #ff4d4d; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2em; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); }
+        .alerta-multa { background: #4a0f0f; color: #ffcccc; border: 2px solid #ff4d4d; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2em; border-radius: 8px; margin-bottom: 25px; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding-left: 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 8px; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; transition: 0.3s; }
+        .btn-add:hover { background: #5da356; }
         .btn-report { background: #d4af37; color: #1a110a; border: none; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1.2em; text-transform: uppercase; transition: 0.3s; }
-        .btn-report:hover { background: #f4e4bc; transform: scale(1.01); }
         .grid-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .caja-input { background: #120c08; padding: 12px; border: 1px solid #3d2b1f; border-radius: 8px; }
         input[type="number"], select { background: #1a110a; color: #fff; border: 1px solid #8b5a2b; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
@@ -30,15 +30,19 @@
 
     <h3>1. Líderes</h3>
     <div id="lista-lideres"></div>
-    <button class="btn-add" id="btn-lider" onclick="nuevoLider()">+ Añadir Líder</button>
+    <button class="btn-add" onclick="nuevoLider()">+ Añadir Líder</button>
 
-    <h3>2. Tropas (Cuartel y Mercenarios)</h3>
-    <div id="lista-tropas"></div>
-    <button class="btn-add" onclick="nuevaFilaTropa()">+ Añadir Tropa</button>
+    <h3>2. Tropas de Cuartel</h3>
+    <div id="lista-cuartel"></div>
+    <button class="btn-add" onclick="nuevaFila('Cuartel')">+ Añadir Tropa de Cuartel</button>
 
-    <h3>3. Edificios</h3>
+    <h3>3. Mercenarios Temporales</h3>
+    <div id="lista-mercenarios"></div>
+    <button class="btn-add" onclick="nuevaFila('Mercenario')">+ Añadir Mercenario Temporal</button>
+
+    <h3>4. Edificios y Otros</h3>
     <div id="lista-fortalezas"></div>
-    <button class="btn-add" id="btn-add-fort" onclick="nuevaFortaleza()">+ Añadir Fortaleza (Máx 4)</button>
+    <button class="btn-add" onclick="nuevaFortaleza()">+ Añadir Fortaleza (Máx 4)</button>
     
     <div class="grid-triple">
         <div class="caja-input"><label>Muros</label><input type="number" id="wall-lvl" min="0" placeholder="Lvl" oninput="calcular()"></div>
@@ -52,22 +56,21 @@
             <input type="radio" name="m" id="m-p" onchange="calcular()"> <label for="m-p">Plata</label>
             <input type="radio" name="m" id="m-o" checked onchange="calcular()"> <label for="m-o">Oro</label>
         </div>
-        <button class="btn-report" onclick="generarInforme()">📋 Copiar Informe Desglosado @K239</button>
+        <button class="btn-report" onclick="generarInforme()">📋 Copiar Informe Detallado @K239</button>
     </div>
 </div>
 
 <script>
-    // Actualización de nombres: C.C. / Distancia
     const dbPrecios = {
         "Cuartel": {
-            "G. Montada": 1250, "G. Voladora": 12500, "G. C.C. / Distancia": 625,
-            "E. Montada": 1400, "E. Voladora": 28000, "E. C.C. / Distancia": 700, "E. Explorador": 3500,
+            "Guardia Montada": 1250, "Guardia Voladora": 12500, "Guardia C.C. / Distancia": 625,
+            "Espec. Montada": 1400, "Espec. Voladora": 28000, "Espec. C.C. / Distancia": 700, "Espec. Explorador": 3500,
             "Asedio": 6250, "Monstruo I": 29000, "Monstruo II": 32000, "Monstruo III": 4000, "Monstruo IV": 8000, "Monstruo V": 12000, "Monstruo VI": 18000, "Monstruo VII": 24000
         },
         "Mercenario": {
-            "M. Montada": 2500, "M. Voladora": 25000, "M. C.C. / Distancia": 1250,
-            "M. E. Montada": 2800, "M. E. Voladora": 28000, "M. E. C.C. / Distancia": 1400, "M. E. Explorador": 7000,
-            "M. Asedio": 12500, "Monst. Montada": 5300, "Monst. Voladora": 7600, "Monst. C.C.": 5000
+            "Merc. Montada": 2500, "Merc. Voladora": 25000, "Merc. C.C. / Distancia": 1250,
+            "M. Espec. Montada": 2800, "M. Espec. Voladora": 28000, "M. Espec. C.C. / Distancia": 1400, "M. Espec. Explorador": 7000,
+            "Merc. Asedio": 12500, "Monst. Montada": 5300, "Monst. Voladora": 7600, "Monst. C.C. / Distancia": 5000
         }
     };
 
@@ -81,33 +84,31 @@
         if (document.querySelectorAll('.l-type').length >= 4) return;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `<select class="l-type"><option value="Héroe">Héroe</option><option value="Capitán">Capitán</option></select>
+        div.innerHTML = `<select class="l-type" onchange="calcular()"><option value="Héroe">Héroe</option><option value="Capitán">Capitán</option></select>
             <input type="number" class="l-lvl" placeholder="Nivel" value="1" oninput="calcular()">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-lideres').appendChild(div);
         calcular();
     }
 
-    function nuevaFilaTropa() {
+    function nuevaFila(tipo) {
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
         let options = "";
-        for (let cat in dbPrecios) {
-            for (let t in dbPrecios[cat]) {
-                options += `<option value="${dbPrecios[cat][t]}">[${cat}] ${t} (${dbPrecios[cat][t].toLocaleString()})</option>`;
-            }
+        for (let t in dbPrecios[tipo]) {
+            options += `<option value="${dbPrecios[tipo][t]}">${t} (${dbPrecios[tipo][t].toLocaleString()})</option>`;
         }
-        div.innerHTML = `<select class="t-tipo" onchange="calcular()">${options}</select>
+        div.innerHTML = `<select class="t-tipo" data-cat="${tipo}" onchange="calcular()">${options}</select>
             <input type="number" class="t-qty" placeholder="Cant" oninput="calcular()">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
-        document.getElementById('lista-tropas').appendChild(div);
+        document.getElementById(tipo === 'Cuartel' ? 'lista-cuartel' : 'lista-mercenarios').appendChild(div);
     }
 
     function nuevaFortaleza() {
         if (document.querySelectorAll('.fort-lvl').length >= 4) return;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `<span>Fortaleza</span><input type="number" class="fort-lvl" placeholder="Lvl" oninput="validarSimple(this)">
+        div.innerHTML = `<span style="flex-grow:1">Fortaleza</span><input type="number" class="fort-lvl" placeholder="Lvl" style="width:100px" oninput="validarSimple(this)">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-fortalezas').appendChild(div);
     }
@@ -115,10 +116,9 @@
     function calcular() {
         let p = 5000000;
         document.querySelectorAll('.l-lvl').forEach(i => p += (parseInt(i.value)||0)*3000);
-        document.querySelectorAll('#lista-tropas .fila-dinamica').forEach(f => {
-            const q = f.querySelector('.t-qty');
-            const v = f.querySelector('.t-tipo');
-            if(q && v) p += (parseInt(q.value)||0) * (parseInt(v.value)||0);
+        document.querySelectorAll('.t-qty').forEach(q => {
+            const v = q.parentElement.querySelector('.t-tipo').value;
+            p += (parseInt(q.value)||0) * parseInt(v);
         });
         document.querySelectorAll('.fort-lvl').forEach(i => p += (parseInt(i.value)||0)*50000000);
         p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
@@ -143,12 +143,13 @@
             inf += `👤 ${tipo} (Lvl ${lvl}): ${((lvl*3000)/f).toLocaleString()} ${mon}\n`;
         });
 
-        document.querySelectorAll('#lista-tropas .fila-dinamica').forEach(t => {
-            const qty = t.querySelector('.t-qty').value || 0;
-            const sel = t.querySelector('.t-tipo');
+        document.querySelectorAll('.t-qty').forEach(q => {
+            const qty = q.value || 0;
+            const sel = q.parentElement.querySelector('.t-tipo');
+            const cat = sel.getAttribute('data-cat');
             const nombre = sel.options[sel.selectedIndex].text.split(' (')[0];
             const precio = parseInt(sel.value);
-            if(qty > 0) inf += `⚔️ ${nombre} x${parseInt(qty).toLocaleString()}: ${((qty*precio)/f).toLocaleString()} ${mon}\n`;
+            if(qty > 0) inf += `⚔️ [${cat}] ${nombre} x${parseInt(qty).toLocaleString()}: ${((qty*precio)/f).toLocaleString()} ${mon}\n`;
         });
 
         document.querySelectorAll('.fort-lvl').forEach((fort, index) => {
@@ -166,7 +167,7 @@
 
         inf += `━━━━━━━━━━━━━━━━━━━━━\n💰 **TOTAL FINAL: ${document.getElementById('total-final').innerText} ${mon}**\n━━━━━━━━━━━━━━━━━━━━━\n@K239`;
 
-        navigator.clipboard.writeText(inf).then(() => alert("✅ Informe detallado copiado al portapapeles."));
+        navigator.clipboard.writeText(inf).then(() => alert("✅ Informe detallado copiado."));
     }
 </script>
 </body>
