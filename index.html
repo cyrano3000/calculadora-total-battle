@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V49 - Global (Inc. Arabic)</title>
+    <title>K239 Calculator V51 - Fixed UI</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; transition: 0.3s; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); position: relative; }
         
-        .header-area { display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #8b5a2b; margin-bottom: 15px; padding-bottom: 10px; position: relative; }
-        h2 { color: #d4af37; text-transform: uppercase; letter-spacing: 2px; margin: 0; font-size: 1.5em; }
-        .lang-btn { position: absolute; right: 0; background: #8b5a2b; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; font-size: 0.9em; z-index: 10; }
-        .lang-btn:hover { background: #d4af37; color: #1a110a; }
+        /* Cabecera con selector fijo a la derecha */
+        .header-area { display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #8b5a2b; margin-bottom: 15px; padding-bottom: 10px; position: relative; min-height: 50px; }
+        h2 { color: #d4af37; text-transform: uppercase; letter-spacing: 2px; margin: 0; font-size: 1.5em; text-align: center; width: 100%; }
+        
+        /* Selector de Idioma (Combo Box) */
+        .lang-container { position: absolute; right: 0; top: 0; }
+        .lang-select { background: #8b5a2b; color: white; border: 1px solid #d4af37; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; outline: none; font-size: 0.85em; }
+        .lang-select option { background: #2c1e16; color: white; }
 
         .alerta-multa { background: #4a0f0f; color: #ffcccc; border: 2px solid #ff4d4d; padding: 15px; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 20px; text-transform: uppercase; }
-        h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; border-right: 0 solid #8b5a2b; padding: 8px 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); }
+        h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding: 8px 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); }
         
         /* Ajuste para Árabe (RTL) */
         .rtl { direction: rtl; }
         .rtl h3 { border-left: 0; border-right: 5px solid #8b5a2b; }
-        .rtl .lang-btn { right: auto; left: 0; }
+        /* Forzamos que el selector se quede a la derecha incluso en RTL */
+        .rtl .lang-container { right: auto; left: 0; direction: ltr; } 
 
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; transition: 0.3s; }
@@ -37,7 +42,16 @@
 <div class="contenedor" id="main-container">
     <div class="header-area">
         <h2 id="txt-titulo">Calculadora K239</h2>
-        <button class="lang-btn" onclick="toggleLang()" id="btn-lang">🌐 IDIOMA</button>
+        <div class="lang-container">
+            <select id="select-lang" class="lang-select" onchange="changeLang()">
+                <option value="es">🇪🇸 ES</option>
+                <option value="en">🇺🇸 EN</option>
+                <option value="fr">🇫🇷 FR</option>
+                <option value="de">🇩🇪 DE</option>
+                <option value="ru">🇷🇺 RU</option>
+                <option value="ar">🇦🇪 AR</option>
+            </select>
+        </div>
     </div>
     
     <div class="alerta-multa" id="txt-alerta">⚠️ Multa de Ataque: 5,000,000 Plata (Fija)</div>
@@ -75,8 +89,7 @@
 </div>
 
 <script>
-    let currentLangIndex = 0;
-    const langs = ['es', 'en', 'fr', 'de', 'ru', 'ar'];
+    let currentLang = 'es';
 
     const translations = {
         es: {
@@ -156,22 +169,17 @@
         ]
     };
 
-    function toggleLang() {
-        currentLangIndex = (currentLangIndex + 1) % langs.length;
+    function changeLang() {
+        currentLang = document.getElementById('select-lang').value;
         updateUI();
     }
 
     function updateUI() {
-        const lang = langs[currentLangIndex];
-        const t = translations[lang];
+        const t = translations[currentLang];
         const container = document.getElementById('main-container');
         
-        // Manejo de dirección RTL para árabe
-        if(lang === 'ar') {
-            container.classList.add('rtl');
-        } else {
-            container.classList.remove('rtl');
-        }
+        if(currentLang === 'ar') container.classList.add('rtl');
+        else container.classList.remove('rtl');
 
         document.getElementById('txt-titulo').innerText = t.titulo;
         document.getElementById('txt-alerta').innerText = t.alerta;
@@ -190,7 +198,6 @@
         document.getElementById('txt-plata').innerText = t.plata;
         document.getElementById('txt-oro').innerText = t.oro;
         document.getElementById('btn-report').innerText = t.report;
-        document.getElementById('btn-lang').innerText = "🌐 " + lang.toUpperCase();
 
         document.querySelectorAll('.l-type').forEach(s => {
             const val = s.value;
@@ -203,7 +210,7 @@
             const cat = s.getAttribute('data-cat');
             let opts = "";
             dbPrecios[cat].forEach(item => {
-                opts += `<option value="${item.p}" ${val==item.p?'selected':''}>${item[lang]} (${item.p.toLocaleString()})</option>`;
+                opts += `<option value="${item.p}" ${val==item.p?'selected':''}>${item[currentLang]} (${item.p.toLocaleString()})</option>`;
             });
             s.innerHTML = opts;
         });
@@ -223,7 +230,7 @@
         if (document.querySelectorAll('.l-type').length >= 4) return;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        const t = translations[langs[currentLangIndex]];
+        const t = translations[currentLang];
         div.innerHTML = `<select class="l-type" onchange="calcular()"><option value="Héroe">${t.hero}</option><option value="Capitán">${t.captain}</option></select>
             <input type="number" class="l-lvl" placeholder="Lvl" value="1" oninput="calcular()">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
@@ -235,9 +242,8 @@
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
         let options = "";
-        const lang = langs[currentLangIndex];
         dbPrecios[tipo].forEach(item => {
-            options += `<option value="${item.p}">${item[lang]} (${item.p.toLocaleString()})</option>`;
+            options += `<option value="${item.p}">${item[currentLang]} (${item.p.toLocaleString()})</option>`;
         });
         div.innerHTML = `<select class="t-tipo" data-cat="${tipo}" onchange="calcular()">${options}</select>
             <input type="number" class="t-qty" placeholder="Cant" oninput="calcular()">
@@ -249,7 +255,7 @@
         if (document.querySelectorAll('.fort-lvl').length >= 4) return;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `<span class="fort-label" style="flex-grow:1">${translations[langs[currentLangIndex]].fortTxt}</span><input type="number" class="fort-lvl" placeholder="Lvl" style="width:100px" oninput="validarSimple(this)">
+        div.innerHTML = `<span class="fort-label" style="flex-grow:1">${translations[currentLang].fortTxt}</span><input type="number" class="fort-lvl" placeholder="Lvl" style="width:100px" oninput="validarSimple(this)">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-fortalezas').appendChild(div);
     }
@@ -272,11 +278,10 @@
     }
 
     function generarInforme() {
-        const lang = langs[currentLangIndex];
         const isOro = document.getElementById('m-o').checked;
         const f = isOro ? 3000 : 1;
-        const mon = isOro ? translations[lang].oro : translations[lang].plata;
-        const t = translations[lang];
+        const mon = isOro ? translations[currentLang].oro : translations[currentLang].plata;
+        const t = translations[currentLang];
         let inf = `📊 **${t.titulo}**\n━━━━━━━━━━━━━━━━━━━━━\n`;
         inf += `✅ ${t.baseFine}: ${(5000000/f).toLocaleString()} ${mon}\n`;
 
