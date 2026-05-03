@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V61 - Hero Limit</title>
+    <title>K239 Calculator V62 - Official Rates</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); position: relative; }
@@ -90,19 +90,25 @@
 
     const dbPrecios = {
         "Cuartel": [
-            { es: "Guardia Montada", en: "Mounted Guard", p: 1250 },
-            { es: "Guardia Voladora", en: "Flying Guard", p: 12500 },
-            { es: "Guardia C.C. / Distancia", en: "Melee / Ranged Guard", p: 625 },
-            { es: "Espec. Montada", en: "Spec. Mounted", p: 1400 },
-            { es: "Espec. Voladora", en: "Spec. Flying", p: 28000 },
-            { es: "Espec. C.C. / Distancia", en: "Spec. Melee / Ranged", p: 700 },
-            { es: "Monstruo III", p: 1250 }, { es: "Monstruo IV", p: 12500 }, { es: "Monstruo V", p: 625 },
-            { es: "Monstruo VI", p: 1400 }, { es: "Monstruo VII", p: 28000 }, { es: "Monstruo I", p: 700 }, { es: "Monstruo II", p: 1400 }
+            { es: "Guardia Montada", p: 1250 },
+            { es: "Guardia Voladora", p: 12500 },
+            { es: "Guardia C.C. / Distancia", p: 625 },
+            { es: "Espec. Montada", p: 1400 },
+            { es: "Espec. Volador / C.C. / Distancia", p: 700 },
+            { es: "Espec. Exploradores", p: 3500 },
+            { es: "Tipo Asedio", p: 6250 },
+            { es: "Monstruo I", p: 29000 },
+            { es: "Monstruo II", p: 32000 },
+            { es: "Monstruo III", p: 4000 },
+            { es: "Monstruo IV", p: 8000 },
+            { es: "Monstruo V", p: 12000 },
+            { es: "Monstruo VI", p: 18000 },
+            { es: "Monstruo VII", p: 24000 }
         ],
         "Mercenario": [
-            { es: "Merc. Montada", en: "Merc. Mounted", p: 2500 },
-            { es: "Merc. Voladora", en: "Merc. Flying", p: 25000 },
-            { es: "Merc. C.C. / Distancia", en: "Merc. Melee / Ranged", p: 1250 }
+            { es: "Merc. Montada", p: 2500 },
+            { es: "Merc. Voladora", p: 25000 },
+            { es: "Merc. C.C. / Distancia", p: 1250 }
         ]
     };
 
@@ -145,19 +151,15 @@
     function actualizarSelectsLideres() {
         const t = translations[currentLang];
         const tieneHeroe = Array.from(document.querySelectorAll('.l-type')).some(s => s.value === 'Héroe');
-        
         document.querySelectorAll('.l-type').forEach(s => {
             const valAnterior = s.value;
             s.innerHTML = '';
-            
-            // Opción Héroe: solo si es el actual o si no hay ninguno en la lista
             if (valAnterior === 'Héroe' || !tieneHeroe) {
                 const optH = document.createElement('option');
                 optH.value = 'Héroe'; optH.innerText = t.hero;
                 if(valAnterior === 'Héroe') optH.selected = true;
                 s.appendChild(optH);
             }
-            
             const optC = document.createElement('option');
             optC.value = 'Capitán'; optC.innerText = t.captain;
             if(valAnterior === 'Capitán') optC.selected = true;
@@ -182,12 +184,12 @@
         div.className = 'fila-dinamica';
         let opts = "";
         dbPrecios[tipo].forEach(item => {
-            let label = (currentLang === 'es') ? item.es : (item.en || item.es);
+            let label = item.es;
             if(label.includes("Monstruo")) label = label.replace("Monstruo", translations[currentLang].monster);
             opts += `<option value="${item.p}">${label} (${item.p.toLocaleString()})</option>`;
         });
         div.innerHTML = `<select class="t-tipo" data-cat="${tipo}" onchange="calcular()">${opts}</select>
-            <input type="number" class="t-qty" placeholder="Cantidad" min="0" oninput="soloPositivos(this)">
+            <input type="number" class="t-qty" placeholder="Cant." min="0" oninput="soloPositivos(this)">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById(tipo === 'Cuartel' ? 'lista-cuartel' : 'lista-mercenarios').appendChild(div);
     }
