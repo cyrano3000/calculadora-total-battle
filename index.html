@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V64 - Full Features</title>
+    <title>K239 Calculator V65 - Official Resources</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); position: relative; }
@@ -51,9 +51,9 @@
     <div id="lista-mercenarios"></div>
     <button class="btn-add" onclick="nuevaFila('Mercenario')" id="btn-add-merc">+ Añadir Mercenario Temporal</button>
 
-    <h3 id="txt-sec-recursos">4. Recursos Robados</h3>
+    <h3 id="txt-sec-recursos">4. Recursos Varios</h3>
     <div id="lista-recursos"></div>
-    <button class="btn-add" onclick="nuevaFila('Recurso')" id="btn-add-rec">+ Añadir Recurso Robado</button>
+    <button class="btn-add" onclick="nuevaFila('Recurso')" id="btn-add-rec">+ Añadir Recurso</button>
 
     <h3 id="txt-sec4">5. Edificios y Otros</h3>
     <div id="lista-fortalezas"></div>
@@ -79,8 +79,8 @@
     let currentLang = 'es';
 
     const translations = {
-        es: { titulo: "Calculadora K239", alerta: "⚠️ Multa de Ataque: 5,000,000 Plata (Fija)", sec1: "1. Líderes", sec2: "2. Tropas y Monstruos de Cuartel", sec3: "3. Mercenarios Temporales", secRec: "4. Recursos Robados", sec4: "5. Edificios y Otros", addLider: "+ Añadir Líder", addCuartel: "+ Añadir Tropa o Monstruo", addMerc: "+ Añadir Mercenario Temporal", addRec: "+ Añadir Recurso Robado", addFort: "+ Añadir Fortaleza (Máx 4)", wall: "Muros", cap: "Capital (1-25)", portal: "Portal", destruido: " Destruido", plata: "Plata", oro: "Oro", report: "📋 Copiar Informe Detallado @K239", hero: "Héroe", captain: "Capitán", fortTxt: "Fortaleza", alertCopy: "✅ Informe detallado copiado.", baseFine: "Multa Base", totalTxt: "TOTAL FINAL", monster: "Monstruo" },
-        en: { titulo: "K239 Calculator", alerta: "⚠️ Attack Fine: 5,000,000 Silver (Fixed)", sec1: "1. Leaders", sec2: "2. Barracks Troops & Monsters", sec3: "3. Temporary Mercenaries", secRec: "4. Stolen Resources", sec4: "5. Buildings & Others", addLider: "+ Add Leader", addCuartel: "+ Add Troop/Monster", addMerc: "+ Add Temp Mercenary", addRec: "+ Add Stolen Resource", addFort: "+ Add Fortress (Max 4)", wall: "Walls", cap: "Capital (1-25)", portal: "Portal", destruido: " Destroyed", plata: "Silver", oro: "Gold", report: "📋 Copy Detailed Report @K239", hero: "Hero", captain: "Captain", fortTxt: "Fortress", alertCopy: "✅ Detailed report copied.", baseFine: "Base Fine", totalTxt: "FINAL TOTAL", monster: "Monster" }
+        es: { titulo: "Calculadora K239", alerta: "⚠️ Multa de Ataque: 5,000,000 Plata (Fija)", sec1: "1. Líderes", sec2: "2. Tropas y Monstruos de Cuartel", sec3: "3. Mercenarios Temporales", secRec: "4. Recursos Varios", sec4: "5. Edificios y Otros", addLider: "+ Añadir Líder", addCuartel: "+ Añadir Tropa o Monstruo", addMerc: "+ Añadir Mercenario Temporal", addRec: "+ Añadir Recurso", addFort: "+ Añadir Fortaleza (Máx 4)", wall: "Muros", cap: "Capital (1-25)", portal: "Portal", destruido: " Destruido", plata: "Plata", oro: "Oro", report: "📋 Copiar Informe Detallado @K239", hero: "Héroe", captain: "Capitán", fortTxt: "Fortaleza", alertCopy: "✅ Informe detallado copiado.", baseFine: "Multa Base", totalTxt: "TOTAL FINAL", monster: "Monstruo" },
+        en: { titulo: "K239 Calculator", alerta: "⚠️ Attack Fine: 5,000,000 Silver (Fixed)", sec1: "1. Leaders", sec2: "2. Barracks Troops & Monsters", sec3: "3. Temporary Mercenaries", secRec: "4. Various Resources", sec4: "5. Buildings & Others", addLider: "+ Add Leader", addCuartel: "+ Add Troop/Monster", addMerc: "+ Add Temp Mercenary", addRec: "+ Add Resource", addFort: "+ Add Fortress (Max 4)", wall: "Walls", cap: "Capital (1-25)", portal: "Portal", destruido: " Destroyed", plata: "Silver", oro: "Gold", report: "📋 Copy Detailed Report @K239", hero: "Hero", captain: "Captain", fortTxt: "Fortress", alertCopy: "✅ Detailed report copied.", baseFine: "Base Fine", totalTxt: "FINAL TOTAL", monster: "Monster" }
     };
 
     const dbPrecios = {
@@ -106,11 +106,8 @@
             { es: "Merc. C.C. / Distancia", p: 1250 }
         ],
         "Recurso": [
-            { es: "Trigo", p: 0.1 },
-            { es: "Madera", p: 0.1 },
-            { es: "Piedra", p: 0.1 },
-            { es: "Hierro", p: 0.2 },
-            { es: "Plata", p: 1 }
+            { es: "Oro", p: 3000 },
+            { es: "Aceite (TAR)", p: 4500 }
         ]
     };
 
@@ -189,7 +186,7 @@
         dbPrecios[tipo].forEach(item => {
             let label = item.es;
             if(label.includes("Monstruo")) label = label.replace("Monstruo", translations[currentLang].monster);
-            opts += `<option value="${item.p}">${label} (${item.p})</option>`;
+            opts += `<option value="${item.p}">${label}</option>`;
         });
         div.innerHTML = `<select class="t-tipo" data-cat="${tipo}" onchange="calcular()">${opts}</select>
             <input type="number" class="t-qty" placeholder="Cant." min="0" oninput="soloPositivos(this)">
@@ -235,7 +232,7 @@
         document.querySelectorAll('.t-qty').forEach(q => {
             const qty = q.value || 0;
             const sel = q.parentElement.querySelector('.t-tipo');
-            const name = sel.options[sel.selectedIndex].text.split(' (')[0];
+            const name = sel.options[sel.selectedIndex].text;
             if(qty > 0) inf += `⚔️ ${name} x${parseFloat(qty).toLocaleString()}: ${((qty*parseFloat(sel.value))/f).toLocaleString()} ${mon}\n`;
         });
 
