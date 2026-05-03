@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V60 - Full Unified</title>
+    <title>K239 Calculator V61 - Hero Limit</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); position: relative; }
@@ -13,8 +13,6 @@
         .lang-select { background: #8b5a2b; color: white; border: 1px solid #d4af37; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         .alerta-multa { background: #4a0f0f; color: #ffcccc; border: 2px solid #ff4d4d; padding: 15px; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 20px; text-transform: uppercase; }
         h3 { color: #d4af37; font-size: 1.1em; margin-top: 25px; border-left: 5px solid #8b5a2b; padding: 8px 15px; text-transform: uppercase; background: rgba(0,0,0,0.2); }
-        .rtl { direction: rtl; }
-        .rtl h3 { border-left: 0; border-right: 5px solid #8b5a2b; }
         .fila-dinamica { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #3d2b1f; }
         .btn-add { background: #4a7c44; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
         .btn-report { background: #d4af37; color: #1a110a; border: none; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1.2em; text-transform: uppercase; }
@@ -24,6 +22,7 @@
         .total-box { margin-top: 30px; padding: 25px; background: #120c08; border: 2px solid #d4af37; text-align: center; border-radius: 12px; }
         #total-final { font-size: 3.5em; color: #d4af37; font-weight: bold; display: block; }
         .del-btn { color:red; background:none; border:none; cursor:pointer; font-weight:bold; font-size: 1.2em; padding: 0 10px; }
+        .rtl { direction: rtl; }
     </style>
 </head>
 <body onload="init()">
@@ -91,24 +90,19 @@
 
     const dbPrecios = {
         "Cuartel": [
-            { es: "Guardia Montada", en: "Mounted Guard", fr: "Garde Montée", de: "Berittene Wache", ru: "Всадник", ar: "حرس خيالة", p: 1250 },
-            { es: "Guardia Voladora", en: "Flying Guard", fr: "Garde Volante", de: "Fliegende Wache", ru: "Летающий страж", ar: "حرس طائر", p: 12500 },
-            { es: "Guardia C.C. / Distancia", en: "Melee / Ranged Guard", fr: "Garde Mêlée / Portée", de: "Nah / Fernkampf Wache", ru: "Ближний / Дальний бой", ar: "حرس مشاة / رماة", p: 625 },
-            { es: "Espec. Montada", en: "Spec. Mounted", fr: "Spéc. Montée", de: "Spez. Berittene", ru: "Спец. Всадник", ar: "خيال خاص", p: 1400 },
-            { es: "Espec. Voladora", en: "Spec. Flying", fr: "Spéc. Volante", de: "Spez. Fliegende", ru: "Спец. Летающий", ar: "طائر خاص", p: 28000 },
-            { es: "Espec. C.C. / Distancia", en: "Spec. Melee / Ranged", fr: "Spéc. Mêlée / Portée", de: "Spez. Nah / Fern", ru: "Спец. Ближний/Дальний", ar: "مشاة/رماة خاص", p: 700 },
-            { es: "Monstruo III", p: 1250 },
-            { es: "Monstruo IV", p: 12500 },
-            { es: "Monstruo V", p: 625 },
-            { es: "Monstruo VI", p: 1400 },
-            { es: "Monstruo VII", p: 28000 },
-            { es: "Monstruo I", p: 700 },
-            { es: "Monstruo II", p: 1400 }
+            { es: "Guardia Montada", en: "Mounted Guard", p: 1250 },
+            { es: "Guardia Voladora", en: "Flying Guard", p: 12500 },
+            { es: "Guardia C.C. / Distancia", en: "Melee / Ranged Guard", p: 625 },
+            { es: "Espec. Montada", en: "Spec. Mounted", p: 1400 },
+            { es: "Espec. Voladora", en: "Spec. Flying", p: 28000 },
+            { es: "Espec. C.C. / Distancia", en: "Spec. Melee / Ranged", p: 700 },
+            { es: "Monstruo III", p: 1250 }, { es: "Monstruo IV", p: 12500 }, { es: "Monstruo V", p: 625 },
+            { es: "Monstruo VI", p: 1400 }, { es: "Monstruo VII", p: 28000 }, { es: "Monstruo I", p: 700 }, { es: "Monstruo II", p: 1400 }
         ],
         "Mercenario": [
-            { es: "Merc. Montada", en: "Merc. Mounted", fr: "Merc. Monté", de: "Söldn. Beritten", ru: "Наем. Всадник", ar: "مرتزق خيال", p: 2500 },
-            { es: "Merc. Voladora", en: "Merc. Flying", fr: "Merc. Volant", de: "Söldn. Fliegend", ru: "Наем. Летающий", ar: "مرتزق طائر", p: 25000 },
-            { es: "Merc. C.C. / Distancia", en: "Merc. Melee / Ranged", fr: "Merc. Mêlée / Portée", de: "Söldn. Nah / Fern", ru: "Наем. Ближний/Дальний", ar: "مرتزق مشاة/رماة", p: 1250 }
+            { es: "Merc. Montada", en: "Merc. Mounted", p: 2500 },
+            { es: "Merc. Voladora", en: "Merc. Flying", p: 25000 },
+            { es: "Merc. C.C. / Distancia", en: "Merc. Melee / Ranged", p: 1250 }
         ]
     };
 
@@ -127,9 +121,6 @@
 
     function updateUI() {
         const t = translations[currentLang];
-        const container = document.getElementById('main-container');
-        currentLang === 'ar' ? container.classList.add('rtl') : container.classList.remove('rtl');
-
         document.getElementById('txt-titulo').innerText = t.titulo;
         document.getElementById('txt-alerta').innerText = t.alerta;
         document.getElementById('txt-sec1').innerText = t.sec1;
@@ -147,54 +138,56 @@
         document.getElementById('txt-plata').innerText = t.plata;
         document.getElementById('txt-oro').innerText = t.oro;
         document.getElementById('btn-report').innerText = t.report;
-
-        document.querySelectorAll('.l-type').forEach(s => {
-            const val = s.value;
-            s.innerHTML = `<option value="Héroe" ${val==='Héroe'?'selected':''}>${t.hero}</option><option value="Capitán" ${val==='Capitán'?'selected':''}>${t.captain}</option>`;
-        });
-
-        document.querySelectorAll('.t-tipo').forEach(s => {
-            const val = s.value;
-            const cat = s.getAttribute('data-cat');
-            let opts = "";
-            dbPrecios[cat].forEach(item => {
-                let label = item[currentLang] || item.es;
-                if(label.includes("Monstruo")) label = label.replace("Monstruo", t.monster);
-                opts += `<option value="${item.p}" ${val==item.p?'selected':''}>${label} (${item.p.toLocaleString()})</option>`;
-            });
-            s.innerHTML = opts;
-        });
-
-        document.querySelectorAll('.fort-label').forEach(span => span.innerText = t.fortTxt);
+        actualizarSelectsLideres();
         calcular();
     }
 
-    function init() { updateUI(); }
+    function actualizarSelectsLideres() {
+        const t = translations[currentLang];
+        const tieneHeroe = Array.from(document.querySelectorAll('.l-type')).some(s => s.value === 'Héroe');
+        
+        document.querySelectorAll('.l-type').forEach(s => {
+            const valAnterior = s.value;
+            s.innerHTML = '';
+            
+            // Opción Héroe: solo si es el actual o si no hay ninguno en la lista
+            if (valAnterior === 'Héroe' || !tieneHeroe) {
+                const optH = document.createElement('option');
+                optH.value = 'Héroe'; optH.innerText = t.hero;
+                if(valAnterior === 'Héroe') optH.selected = true;
+                s.appendChild(optH);
+            }
+            
+            const optC = document.createElement('option');
+            optC.value = 'Capitán'; optC.innerText = t.captain;
+            if(valAnterior === 'Capitán') optC.selected = true;
+            s.appendChild(optC);
+        });
+    }
 
     function nuevoLider() {
         if (document.querySelectorAll('.l-type').length >= 4) return;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        const t = translations[currentLang];
-        div.innerHTML = `<select class="l-type" onchange="calcular()"><option value="Héroe">${t.hero}</option><option value="Capitán">${t.captain}</option></select>
-            <input type="number" class="l-lvl" value="1" min="0" onkeydown="filtroTeclas(event)" oninput="soloPositivos(this)">
-            <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
+        div.innerHTML = `<select class="l-type" onchange="actualizarSelectsLideres(); calcular()"></select>
+            <input type="number" class="l-lvl" value="1" min="0" oninput="soloPositivos(this)">
+            <button onclick="this.parentElement.remove(); actualizarSelectsLideres(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-lideres').appendChild(div);
+        actualizarSelectsLideres();
         calcular();
     }
 
     function nuevaFila(tipo) {
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        let options = "";
-        const t = translations[currentLang];
+        let opts = "";
         dbPrecios[tipo].forEach(item => {
-            let label = item[currentLang] || item.es;
-            if(label.includes("Monstruo")) label = label.replace("Monstruo", t.monster);
-            options += `<option value="${item.p}">${label} (${item.p.toLocaleString()})</option>`;
+            let label = (currentLang === 'es') ? item.es : (item.en || item.es);
+            if(label.includes("Monstruo")) label = label.replace("Monstruo", translations[currentLang].monster);
+            opts += `<option value="${item.p}">${label} (${item.p.toLocaleString()})</option>`;
         });
-        div.innerHTML = `<select class="t-tipo" data-cat="${tipo}" onchange="calcular()">${options}</select>
-            <input type="number" class="t-qty" placeholder="Cantidad" min="0" onkeydown="filtroTeclas(event)" oninput="soloPositivos(this)">
+        div.innerHTML = `<select class="t-tipo" data-cat="${tipo}" onchange="calcular()">${opts}</select>
+            <input type="number" class="t-qty" placeholder="Cantidad" min="0" oninput="soloPositivos(this)">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById(tipo === 'Cuartel' ? 'lista-cuartel' : 'lista-mercenarios').appendChild(div);
     }
@@ -203,18 +196,18 @@
         if (document.querySelectorAll('.fort-lvl').length >= 4) return;
         const div = document.createElement('div');
         div.className = 'fila-dinamica';
-        div.innerHTML = `<span class="fort-label" style="flex-grow:1">${translations[currentLang].fortTxt}</span><input type="number" class="fort-lvl" value="1" min="0" max="25" onkeydown="filtroTeclas(event)" oninput="soloPositivos(this, 25)">
+        div.innerHTML = `<span class="fort-label" style="flex-grow:1">${translations[currentLang].fortTxt}</span><input type="number" class="fort-lvl" value="1" min="0" max="25" oninput="soloPositivos(this, 25)">
             <button onclick="this.parentElement.remove(); calcular();" class="del-btn">✖</button>`;
         document.getElementById('lista-fortalezas').appendChild(div);
     }
 
     function calcular() {
         let p = 5000000;
-        document.querySelectorAll('.l-lvl').forEach(i => p += (Math.max(0, parseInt(i.value))||0)*3000);
-        document.querySelectorAll('.t-qty').forEach(q => p += (Math.max(0, parseInt(q.value))||0) * parseInt(q.parentElement.querySelector('.t-tipo').value));
-        document.querySelectorAll('.fort-lvl').forEach(i => p += (Math.max(0, parseInt(i.value))||0)*50000000);
-        p += (Math.max(0, parseInt(document.getElementById('wall-lvl').value))||0)*1000000;
-        p += (Math.max(0, parseInt(document.getElementById('cap-lvl').value))||0)*450000000;
+        document.querySelectorAll('.l-lvl').forEach(i => p += (parseInt(i.value)||0)*3000);
+        document.querySelectorAll('.t-qty').forEach(q => p += (parseInt(q.value)||0) * parseInt(q.parentElement.querySelector('.t-tipo').value));
+        document.querySelectorAll('.fort-lvl').forEach(i => p += (parseInt(i.value)||0)*50000000);
+        p += (parseInt(document.getElementById('wall-lvl').value)||0)*1000000;
+        p += (parseInt(document.getElementById('cap-lvl').value)||0)*450000000;
         if(document.getElementById('check-portal').checked) p += 5000000;
         const isO = document.getElementById('m-o').checked;
         document.getElementById('total-final').innerText = Math.round(isO ? p/3000 : p).toLocaleString();
@@ -225,42 +218,29 @@
         const f = isOro ? 3000 : 1;
         const mon = isOro ? translations[currentLang].oro : translations[currentLang].plata;
         const t = translations[currentLang];
-        
-        let inf = `📊 **${t.titulo}**\n━━━━━━━━━━━━━━━━━━━━━\n`;
-        inf += `✅ ${t.baseFine}: ${(5000000/f).toLocaleString()} ${mon}\n`;
-
+        let inf = `📊 **${t.titulo}**\n━━━━━━━━━━━━━━━━━━━━━\n✅ ${t.baseFine}: ${(5000000/f).toLocaleString()} ${mon}\n`;
         document.querySelectorAll('#lista-lideres .fila-dinamica').forEach(l => {
-            const type = l.querySelector('.l-type').value;
-            const lvl = Math.max(0, l.querySelector('.l-lvl').value || 0);
-            const typeTxt = type === 'Héroe' ? t.hero : t.captain;
-            inf += `👤 ${typeTxt} (Lvl ${lvl}): ${((lvl*3000)/f).toLocaleString()} ${mon}\n`;
+            const type = l.querySelector('.l-type').value === 'Héroe' ? t.hero : t.captain;
+            const lvl = l.querySelector('.l-lvl').value || 0;
+            inf += `👤 ${type} (Lvl ${lvl}): ${((lvl*3000)/f).toLocaleString()} ${mon}\n`;
         });
-
         document.querySelectorAll('.t-qty').forEach(q => {
-            const qty = Math.max(0, q.value || 0);
+            const qty = q.value || 0;
             const sel = q.parentElement.querySelector('.t-tipo');
             const name = sel.options[sel.selectedIndex].text.split(' (')[0];
-            const price = parseInt(sel.value);
-            if(qty > 0) inf += `⚔️ ${name} x${parseInt(qty).toLocaleString()}: ${((qty*price)/f).toLocaleString()} ${mon}\n`;
+            if(qty > 0) inf += `⚔️ ${name} x${parseInt(qty).toLocaleString()}: ${((qty*parseInt(sel.value))/f).toLocaleString()} ${mon}\n`;
         });
-
-        document.querySelectorAll('.fort-lvl').forEach((fort, index) => {
-            const lvl = Math.max(0, fort.value || 0);
-            if(lvl > 0) inf += `🛡️ ${t.fortTxt} ${index+1} (Lvl ${lvl}): ${((lvl*50000000)/f).toLocaleString()} ${mon}\n`;
-        });
-
-        const wall = Math.max(0, parseInt(document.getElementById('wall-lvl').value)||0);
-        if(wall > 0) inf += `🧱 ${t.wall} (Lvl ${wall}): ${((wall*1000000)/f).toLocaleString()} ${mon}\n`;
-
-        const cap = Math.max(0, parseInt(document.getElementById('cap-lvl').value)||0);
-        if(cap > 0) inf += `🏰 ${t.cap.split(' (')[0]} (Lvl ${cap}): ${((cap*450000000)/f).toLocaleString()} ${mon}\n`;
-
+        document.querySelectorAll('.fort-lvl').forEach((fort, i) => inf += `🛡️ ${t.fortTxt} ${i+1} (Lvl ${fort.value}): ${((fort.value*50000000)/f).toLocaleString()} ${mon}\n`);
+        const w = document.getElementById('wall-lvl').value || 0;
+        if(w > 0) inf += `🧱 ${t.wall} (Lvl ${w}): ${((w*1000000)/f).toLocaleString()} ${mon}\n`;
+        const c = document.getElementById('cap-lvl').value || 0;
+        if(c > 0) inf += `🏰 ${t.cap.split(' (')[0]} (Lvl ${c}): ${((c*450000000)/f).toLocaleString()} ${mon}\n`;
         if(document.getElementById('check-portal').checked) inf += `🌀 ${t.portal}${t.destruido}: ${(5000000/f).toLocaleString()} ${mon}\n`;
-
         inf += `━━━━━━━━━━━━━━━━━━━━━\n💰 **${t.totalTxt}: ${document.getElementById('total-final').innerText} ${mon}**\n━━━━━━━━━━━━━━━━━━━━━\n@K239`;
-
         navigator.clipboard.writeText(inf).then(() => alert(t.alertCopy));
     }
+
+    function init() { updateUI(); }
 </script>
 </body>
 </html>
