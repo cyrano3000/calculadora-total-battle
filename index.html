@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K239 Calculator V66 - Multi-Lang & Wall Limit</title>
+    <title>K239 Calculator V67 - Default EN</title>
     <style>
         body { background: #1a110a; color: #f4e4bc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .contenedor { max-width: 900px; margin: auto; background: #2c1e16; border: 2px solid #8b5a2b; padding: 30px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.9); position: relative; }
@@ -28,11 +28,11 @@
 
 <div class="contenedor">
     <div class="header-area">
-        <h2 id="txt-titulo">Calculadora K239</h2>
+        <h2 id="txt-titulo">K239 Calculator</h2>
         <div class="lang-container">
             <select id="select-lang" class="lang-select" onchange="changeLang()">
+                <option value="en" selected>🇺🇸 EN</option>
                 <option value="es">🇪🇸 ES</option>
-                <option value="en">🇺🇸 EN</option>
                 <option value="fr">🇫🇷 FR</option>
                 <option value="de">🇩🇪 DE</option>
                 <option value="ru">🇷🇺 RU</option>
@@ -41,46 +41,46 @@
         </div>
     </div>
     
-    <div class="alerta-multa" id="txt-alerta">⚠️ Multa de Ataque: 5,000,000 Plata (Fija)</div>
+    <div class="alerta-multa" id="txt-alerta">⚠️ Attack Fine: 5,000,000 Silver (Fixed)</div>
 
-    <h3 id="txt-sec1">1. Líderes</h3>
+    <h3 id="txt-sec1">1. Leaders</h3>
     <div id="lista-lideres"></div>
-    <button class="btn-add" onclick="nuevoLider()" id="btn-add-lider">+ Añadir Líder</button>
+    <button class="btn-add" onclick="nuevoLider()" id="btn-add-lider">+ Add Leader</button>
 
-    <h3 id="txt-sec2">2. Tropas y Monstruos de Cuartel</h3>
+    <h3 id="txt-sec2">2. Barracks Troops & Monsters</h3>
     <div id="lista-cuartel"></div>
-    <button class="btn-add" onclick="nuevaFila('Cuartel')" id="btn-add-cuartel">+ Añadir Tropa o Monstruo</button>
+    <button class="btn-add" onclick="nuevaFila('Cuartel')" id="btn-add-cuartel">+ Add Troop/Monster</button>
 
-    <h3 id="txt-sec3">3. Mercenarios Temporales</h3>
+    <h3 id="txt-sec3">3. Temporary Mercenaries</h3>
     <div id="lista-mercenarios"></div>
-    <button class="btn-add" onclick="nuevaFila('Mercenario')" id="btn-add-merc">+ Añadir Mercenario Temporal</button>
+    <button class="btn-add" onclick="nuevaFila('Mercenario')" id="btn-add-merc">+ Add Temp Mercenary</button>
 
-    <h3 id="txt-sec-recursos">4. Recursos Varios</h3>
+    <h3 id="txt-sec-recursos">4. Various Resources</h3>
     <div id="lista-recursos"></div>
-    <button class="btn-add" onclick="nuevaFila('Recurso')" id="btn-add-rec">+ Añadir Recurso</button>
+    <button class="btn-add" onclick="nuevaFila('Recurso')" id="btn-add-rec">+ Add Resource</button>
 
-    <h3 id="txt-sec4">5. Edificios y Otros</h3>
+    <h3 id="txt-sec4">5. Buildings & Others</h3>
     <div id="lista-fortalezas"></div>
-    <button class="btn-add" onclick="nuevaFortaleza()" id="btn-add-fort">+ Añadir Fortaleza (Máx 4)</button>
+    <button class="btn-add" onclick="nuevaFortaleza()" id="btn-add-fort">+ Add Fortress (Max 4)</button>
     
     <div class="grid-triple">
-        <div class="caja-input"><label id="txt-wall">Muros (1-8)</label><input type="number" id="wall-lvl" min="0" max="8" oninput="soloPositivos(this, 8)"></div>
+        <div class="caja-input"><label id="txt-wall">Walls (1-8)</label><input type="number" id="wall-lvl" min="0" max="8" oninput="soloPositivos(this, 8)"></div>
         <div class="caja-input"><label id="txt-cap">Capital (1-25)</label><input type="number" id="cap-lvl" min="0" max="25" oninput="soloPositivos(this, 25)"></div>
-        <div class="caja-input"><label id="txt-portal">Portal</label><div style="margin-top:5px;"><input type="checkbox" id="check-portal" onchange="calcular()"><span id="txt-destruido"> Destruido</span></div></div>
+        <div class="caja-input"><label id="txt-portal">Portal</label><div style="margin-top:5px;"><input type="checkbox" id="check-portal" onchange="calcular()"><span id="txt-destruido"> Destroyed</span></div></div>
     </div>
 
     <div class="total-box">
         <span id="total-final">0</span>
         <div style="margin-top:10px; margin-bottom: 20px;">
-            <input type="radio" name="m" id="m-p" onchange="calcular()"> <label for="m-p" id="txt-plata">Plata</label>
-            <input type="radio" name="m" id="m-o" checked onchange="calcular()"> <label for="m-o" id="txt-oro">Oro</label>
+            <input type="radio" name="m" id="m-p" onchange="calcular()"> <label for="m-p" id="txt-plata">Silver</label>
+            <input type="radio" name="m" id="m-o" checked onchange="calcular()"> <label for="m-o" id="txt-oro">Gold</label>
         </div>
-        <button class="btn-report" onclick="generarInforme()" id="btn-report">📋 Copiar Informe Detallado @K239</button>
+        <button class="btn-report" onclick="generarInforme()" id="btn-report">📋 Copy Detailed Report @K239</button>
     </div>
 </div>
 
 <script>
-    let currentLang = 'es';
+    let currentLang = 'en';
 
     const translations = {
         es: { titulo: "Calculadora K239", alerta: "⚠️ Multa de Ataque: 5,000,000 Plata (Fija)", sec1: "1. Líderes", sec2: "2. Tropas y Monstruos de Cuartel", sec3: "3. Mercenarios Temporales", secRec: "4. Recursos Varios", sec4: "5. Edificios y Otros", addLider: "+ Añadir Líder", addCuartel: "+ Añadir Tropa o Monstruo", addMerc: "+ Añadir Mercenario Temporal", addRec: "+ Añadir Recurso", addFort: "+ Añadir Fortaleza (Máx 4)", wall: "Muros (1-8)", cap: "Capital (1-25)", portal: "Portal", destruido: " Destruido", plata: "Plata", oro: "Oro", report: "📋 Copiar Informe Detallado @K239", hero: "Héroe", captain: "Capitán", fortTxt: "Fortaleza", alertCopy: "✅ Informe detallado copiado.", baseFine: "Multa Base", totalTxt: "TOTAL FINAL", monster: "Monstruo", gold: "Oro", oil: "Aceite (TAR)" },
@@ -154,7 +154,6 @@
         document.getElementById('btn-report').innerText = t.report;
         actualizarSelectsLideres();
         
-        // Actualizar nombres en combos ya abiertos
         document.querySelectorAll('.t-tipo').forEach(sel => {
             const cat = sel.getAttribute('data-cat');
             const val = sel.value;
